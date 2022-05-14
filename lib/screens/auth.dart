@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/colors.dart';
 import '../data/strings.dart';
 
-import '../widgets/occbutton.dart';
+import '../widgets/occButton.dart';
 
 class AuthContent extends StatefulWidget {
   const AuthContent({Key? key}) : super(key: key);

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../data/colors.dart';
 import '../data/strings.dart';
-import '../widgets/occbutton.dart';
+import '../widgets/occButton.dart';
+import '../widgets/occCard.dart';
 
 class DashContent extends StatefulWidget {
   const DashContent({Key? key}) : super(key: key);
@@ -56,66 +57,27 @@ class _DashContentState extends State<DashContent> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.max,
-                  children: [
+                  children: const [
                     Expanded(
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: Column(
-                            children: const [
-                              Text(
-                                "در انتظار تایید",
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                "3",
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        color: textFieldBgColor,
+                      child: OccCard(
+                        head: pendingFilesLabel,
+                        sub: "3",
                       ),
                     ),
                     Expanded(
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: Column(
-                            children: const [
-                              Text(
-                                "فایل های تایید شده",
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                "24",
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        color: textFieldBgColor,
+                      child: OccCard(
+                        head: confirmedFilesLabel,
+                        sub: "24",
                       ),
                     ),
                   ],
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 40),
-                  child: OccButton(onPressed: () {}, label: "ثبت فایل جدید"),
+                  child: OccButton(
+                    onPressed: () {},
+                    label: newFileButton,
+                  ),
                 ),
                 const Spacer(),
               ],
