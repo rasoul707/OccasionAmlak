@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+part 'apartment.g.dart';
+
 @JsonSerializable()
 class Apartment {
   String? id;

@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+part 'villa.g.dart';
+
 @JsonSerializable()
 class Villa {
   String? id;

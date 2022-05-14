@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:theme_mode_handler/theme_mode_manager_interface.dart';
 
-import 'colors.dart';
+import '../data/colors.dart';
 
 class ThemeModeManager implements IThemeModeManager {
   static const themeKey = 'theme_mode';

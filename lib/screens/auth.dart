@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
+
+import '../widgets/occButton.dart';
 
 import '../data/colors.dart';
 import '../data/strings.dart';
 
-import '../widgets/occButton.dart';
+import '../api/main.dart';
+
+import '../models/user.dart';
+
+import '../helpers/user.dart';
 
 class AuthContent extends StatefulWidget {
   const AuthContent({Key? key}) : super(key: key);
@@ -13,9 +21,45 @@ class AuthContent extends StatefulWidget {
 }
 
 class _AuthContentState extends State<AuthContent> {
+  //
   @override
   void initState() {
     super.initState();
+  }
+
+  final FocusNode passwordNode = FocusNode();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  submit() async {
+    String username = usernameController.text;
+    String password = passwordController.text;
+
+    LoginRes result = await API(Dio())
+        .login(LoginReq(username: username, password: password))
+        .catchError(
+      (Object obj) {
+        switch (obj.runtimeType) {
+          case DioError:
+            final res = (obj as DioError).response;
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text((res!.data.toString())),
+            ));
+            break;
+          default:
+            break;
+        }
+        return LoginRes();
+      },
+    );
+
+    if (result.token is String) {
+      await setAuthToken(result.token!);
+      await saveUserData(result.user!);
+    } else {
+      await removeAuthToken();
+      await removeUserData();
+    }
   }
 
   @override
@@ -31,7 +75,7 @@ class _AuthContentState extends State<AuthContent> {
               children: [
                 const Spacer(),
                 const Image(
-                  image: const AssetImage("assets/images/logo.png"),
+                  image: AssetImage("assets/images/logo.png"),
                   width: 220,
                 ),
                 const Padding(
@@ -61,9 +105,10 @@ class _AuthContentState extends State<AuthContent> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: TextFormField(
+                    controller: usernameController,
                     textInputAction: TextInputAction.next,
                     onEditingComplete: () {
-                      // FocusScope.of(context).requestFocus(focusF2);
+                      FocusScope.of(context).requestFocus(passwordNode);
                     },
                     textAlign: TextAlign.left,
                     textDirection: TextDirection.ltr,
@@ -73,7 +118,7 @@ class _AuthContentState extends State<AuthContent> {
                     decoration: const InputDecoration(
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       filled: true,
-                      labelText: "نام کاربری",
+                      labelText: usernameLabel,
                       border: OutlineInputBorder(
                         borderSide: BorderSide.none,
                         borderRadius: BorderRadius.all(
@@ -92,11 +137,10 @@ class _AuthContentState extends State<AuthContent> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: TextFormField(
+                    controller: passwordController,
                     textInputAction: TextInputAction.done,
-                    // keyboardType: ,
-                    onEditingComplete: () {
-                      // FocusScope.of(context).requestFocus(focusF2);
-                    },
+                    focusNode: passwordNode,
+                    onEditingComplete: submit,
                     obscureText: true,
                     enableSuggestions: false,
                     autocorrect: false,
@@ -106,7 +150,7 @@ class _AuthContentState extends State<AuthContent> {
                     decoration: const InputDecoration(
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       filled: true,
-                      labelText: "رمز اکانت",
+                      labelText: passwordLabel,
                       border: OutlineInputBorder(
                         borderSide: BorderSide.none,
                         borderRadius: BorderRadius.all(
@@ -125,8 +169,8 @@ class _AuthContentState extends State<AuthContent> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 40),
                   child: OccButton(
-                    onPressed: () {},
-                    label: "ورود به سامانه",
+                    onPressed: submit,
+                    label: loginButtonLabel,
                   ),
                 ),
                 const Spacer(),

@@ -6,6 +6,7 @@ const appVer = "ورژن 1.0";
 const loginFormTitle = "فرم ورود";
 const usernameLabel = "نام کاربری";
 const passwordLabel = "رمز اکانت";
+const loginButtonLabel = "ورود به سامانه";
 
 // dash
 const confirmedFilesLabel = "فایل های تایید شده";

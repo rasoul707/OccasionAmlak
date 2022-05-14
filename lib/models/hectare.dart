@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+part 'hectare.g.dart';
+
 @JsonSerializable()
 class Hectare {
   String? id;

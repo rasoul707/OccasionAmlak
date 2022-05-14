@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:theme_mode_handler/theme_mode_handler.dart';
-import 'package:dio/dio.dart';
-import 'api/user.dart';
 
+import 'package:dio/dio.dart';
+
+import 'api/main.dart';
 import 'data/strings.dart';
-import 'data/theme.dart';
+
+import 'widgets/theme.dart';
 
 import 'screens/splash.dart';
 import 'screens/auth.dart';
 import 'screens/dash.dart';
 import 'screens/new.dart';
+
+import 'models/user.dart';
+
+import 'api/services.dart';
 
 void main() {
   debugPaintSizeEnabled = false;
@@ -53,6 +60,10 @@ class App extends StatelessWidget {
 // ##################
 // ##################
 
+// ##################
+// ##################
+// ##################
+
 class RootApp extends StatefulWidget {
   const RootApp({Key? key}) : super(key: key);
 
@@ -62,69 +73,88 @@ class RootApp extends StatefulWidget {
 
 class _RootAppState extends State<RootApp> {
   bool isLoaded = false;
-  bool mainContentLoad = false;
-  late String ggg = "5555";
+  bool isValid = false;
 
-  void toggleAuthScreen(bool oc) {
-    setState(() {
-      mainContentLoad = oc;
-    });
-  }
+  // void toggleAuthScreen(bool oc) {
+  //   setState(() {
+  //     isValid = oc;
+  //   });
+  // }
 
-  void toggleSplashScreen(bool oc) {
-    setState(() {
-      isLoaded = oc;
-    });
-  }
+  // void toggleSplashScreen(bool oc) {
+  //   setState(() {
+  //     isLoaded = oc;
+  //   });
+  // }
 
   @override
   void initState() {
     super.initState();
-    isLoaded = true;
-    mainContentLoad = true;
-    // Future.delayed(
-    //   const Duration(seconds: 2),
-    //   () {
-    //     toggleSplashScreen(true);
-    //     Future.delayed(
-    //       const Duration(seconds: 3),
-    //       () {
-    //         toggleAuthScreen(false);
-    //       },
-    //     );
-    //   },
-    // );
+    isLoaded = false;
+    isValid = false;
+  }
+
+  Future<Widget> validation() async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    String? token = localStorage.getString("authToken");
+    Widget? Comp = null;
+    if (token is String) {
+      String result =
+          await API(Dio(BaseOptions(headers: {"Authorization": token})))
+              .validate()
+              .catchError(
+        (Object obj) {
+          switch (obj.runtimeType) {
+            case DioError:
+              final res = (obj as DioError).response;
+              print(res!.data);
+              break;
+            default:
+              break;
+          }
+          return "error";
+        },
+      );
+
+      if (result == 'error') {
+        localStorage.remove("authToken");
+        localStorage.remove("displayName");
+        Comp = const AuthContent();
+      } else {
+        Comp = const DashContent();
+      }
+    } else {
+      Comp = const AuthContent();
+    }
+
+    return Comp;
   }
 
   @override
   Widget build(BuildContext context) {
-    // return FutureBuilder<List<Task>>(
-    //   future: RestClient(Dio()).getTasks(),
-    //   builder: (context, snapshot) {
-    //     // if (snapshot.hasData) {
-    //     //   return Text(snapshot.data!.elementAt(3).name!);
-    //     // } else if (snapshot.hasError) {
-    //     //   return Text('${snapshot.error}');
-    //     // }
-    //     return const SplashScreen();
-    //   },
-    // );
+    return FutureBuilder<Widget>(
+      future: validation(),
+      builder: (context, snapshot) {
+        return snapshot.data!;
+      },
+      initialData: const SplashScreen(),
+    );
 
     return Stack(
       children: [
         WillPopScope(
           onWillPop: () async {
-            if (!mainContentLoad) {
+            if (!isValid) {
               setState(() {
-                mainContentLoad = true;
+                isValid = true;
               });
               return false;
             }
             return true;
           },
           child: isLoaded
-              ? mainContentLoad
-                  ? Text(ggg.toString())
+              ? isValid
+                  ? Text("ggg".toString())
                   : const AuthContent()
               : const SplashScreen(),
         )

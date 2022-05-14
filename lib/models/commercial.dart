@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+part 'commercial.g.dart';
+
 @JsonSerializable()
 class Commercial {
   String? id;
