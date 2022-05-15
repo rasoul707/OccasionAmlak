@@ -58,7 +58,9 @@ Future<String> setAuthToken(String token) async {
 
 Future<String?> getAuthToken() async {
   SharedPreferences localStorage = await SharedPreferences.getInstance();
-  return localStorage.getString("authToken");
+  String? m = localStorage.getString("authToken");
+  if (m is String) return 'Bearer ' + m;
+  return null;
 }
 
 Future<bool> removeAuthToken() async {

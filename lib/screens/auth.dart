@@ -1,30 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
-
-import '../widgets/occButton.dart';
 
 import '../data/colors.dart';
 import '../data/strings.dart';
 
+import '../widgets/occButton.dart';
+
 import '../api/main.dart';
-
 import '../models/user.dart';
-
 import '../helpers/user.dart';
 
 class AuthContent extends StatefulWidget {
-  const AuthContent({Key? key}) : super(key: key);
+  const AuthContent(this.reloadMain, {Key? key}) : super(key: key);
+
+  final void Function() reloadMain;
 
   @override
   _AuthContentState createState() => _AuthContentState();
 }
 
 class _AuthContentState extends State<AuthContent> {
-  //
+  bool disabled = false;
+
   @override
   void initState() {
     super.initState();
+    disabled = false;
+
+    removeUsageData();
+  }
+
+  void removeUsageData() async {
+    await removeAuthToken();
+    await removeUserData();
   }
 
   final FocusNode passwordNode = FocusNode();
@@ -32,34 +40,50 @@ class _AuthContentState extends State<AuthContent> {
   final TextEditingController passwordController = TextEditingController();
 
   submit() async {
+    if (disabled) return;
+    setState(() {
+      disabled = true;
+    });
     String username = usernameController.text;
     String password = passwordController.text;
 
     LoginRes result = await API(Dio())
         .login(LoginReq(username: username, password: password))
-        .catchError(
-      (Object obj) {
-        switch (obj.runtimeType) {
-          case DioError:
-            final res = (obj as DioError).response;
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text((res!.data.toString())),
-            ));
-            break;
-          default:
-            break;
-        }
-        return LoginRes();
-      },
-    );
+        .catchError((Object obj) {
+      if (obj.runtimeType == DioError) {
+        final res = (obj as DioError).response;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            res!.data['code'],
+            style: const TextStyle(fontFamily: 'Vazir', color: whiteTextColor),
+          ),
+          backgroundColor: errorColor,
+          duration: const Duration(seconds: 1),
+        ));
+      }
+      return LoginRes(token: null);
+    });
 
     if (result.token is String) {
       await setAuthToken(result.token!);
       await saveUserData(result.user!);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(
+          loginSuccessText,
+          style: TextStyle(fontFamily: 'Vazir', color: whiteTextColor),
+        ),
+        backgroundColor: successColor,
+        duration: Duration(seconds: 1),
+      ));
     } else {
       await removeAuthToken();
       await removeUserData();
     }
+    setState(() {
+      disabled = false;
+    });
+
+    widget.reloadMain();
   }
 
   @override
@@ -106,6 +130,7 @@ class _AuthContentState extends State<AuthContent> {
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: TextFormField(
                     controller: usernameController,
+                    enabled: !disabled,
                     textInputAction: TextInputAction.next,
                     onEditingComplete: () {
                       FocusScope.of(context).requestFocus(passwordNode);
@@ -138,6 +163,7 @@ class _AuthContentState extends State<AuthContent> {
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: TextFormField(
                     controller: passwordController,
+                    enabled: !disabled,
                     textInputAction: TextInputAction.done,
                     focusNode: passwordNode,
                     onEditingComplete: submit,
@@ -171,6 +197,7 @@ class _AuthContentState extends State<AuthContent> {
                   child: OccButton(
                     onPressed: submit,
                     label: loginButtonLabel,
+                    loading: disabled,
                   ),
                 ),
                 const Spacer(),

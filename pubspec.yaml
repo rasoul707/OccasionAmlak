@@ -33,6 +33,9 @@ dependencies:
 
   retrofit: ">=3.0.0 <4.0.0"
   logger: any #for logging purpose
+  url_launcher: ^6.1.2
+  flutter_map: ^0.14.0
+  geolocator: ^8.2.1
 
 dev_dependencies:
   flutter_test:

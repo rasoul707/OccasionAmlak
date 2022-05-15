@@ -9,11 +9,15 @@ part 'main.g.dart';
 abstract class API {
   factory API(Dio dio, {String baseUrl}) = _API;
 
+  @POST("jwt-auth/v1/token")
+  Future<LoginRes> login(@Body() LoginReq loginReq);
+
   @POST("jwt-auth/v1/token/validate")
   Future<String> validate();
 
-  @POST("jwt-auth/v1/token")
-  Future<LoginRes> login(
-    @Body() LoginReq loginReq,
-  );
+  @GET("method/getMe")
+  Future<User> getMe();
+
+  @POST("method/addFile")
+  Future<String> addFile();
 }

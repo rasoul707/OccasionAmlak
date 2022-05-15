@@ -6,15 +6,17 @@ class OccButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String label;
   final String? type;
-  final bool? disabled;
+  final bool? enabled;
+  final bool? loading;
 
-  const OccButton(
-      {Key? key,
-      required this.onPressed,
-      required this.label,
-      this.type,
-      this.disabled})
-      : super(key: key);
+  const OccButton({
+    Key? key,
+    required this.onPressed,
+    required this.label,
+    this.type,
+    this.enabled,
+    this.loading,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +42,34 @@ class OccButton extends StatelessWidget {
       );
     }
 
-    if (disabled is bool && disabled == true) {
+    if (enabled is bool && enabled == false) {
       _decour = const BoxDecoration(
-        color: extraColor,
+        color: disabledColor,
         borderRadius: BorderRadius.all(
           Radius.circular(50),
         ),
+      );
+    }
+
+    void Function()? _onPress = onPressed;
+    Widget child = Text(
+      label,
+      style: const TextStyle(
+        color: textColor,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+    if (enabled is bool && enabled == false) {
+      _onPress = null;
+    } else if (loading is bool && loading == true) {
+      _onPress = null;
+      child = const SizedBox(
+        child: CircularProgressIndicator(
+          color: Colors.white,
+          strokeWidth: 3,
+        ),
+        height: 25,
+        width: 25,
       );
     }
 
@@ -58,14 +82,8 @@ class OccButton extends StatelessWidget {
         height: 50,
         width: double.infinity,
         child: TextButton(
-          onPressed: onPressed,
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: textColor,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          onPressed: _onPress,
+          child: child,
         ),
       ),
     );
