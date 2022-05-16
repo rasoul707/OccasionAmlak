@@ -42,7 +42,7 @@ class OccSelectList extends StatelessWidget {
     );
 
     void _onTap(String label) {
-      if (multiple!) {
+      if (multiple is bool && multiple!) {
         if (active.contains(label)) {
           active.remove(label);
         } else {
