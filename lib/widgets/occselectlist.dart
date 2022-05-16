@@ -7,11 +7,13 @@ class OccSelectList extends StatelessWidget {
     required this.items,
     required this.active,
     required this.setActive,
+    this.enabled,
   }) : super(key: key);
 
   final List<String> items;
   final List<String> active;
   final void Function(List<String>) setActive;
+  final bool? enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +72,9 @@ class OccSelectList extends StatelessWidget {
       height: 50,
       child: ListView(
         scrollDirection: Axis.horizontal,
+        physics: (enabled is bool && enabled == false)
+            ? const NeverScrollableScrollPhysics()
+            : null,
         children: items.map((e) => item(e, active.contains(e))).toList(),
       ),
     );

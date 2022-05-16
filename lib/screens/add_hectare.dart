@@ -25,10 +25,6 @@ class AddHectare extends StatefulWidget {
 }
 
 class _AddHectareState extends State<AddHectare> {
-  // widget.index
-
-  bool disabled = false;
-
   final TextEditingController usageStatusController = TextEditingController();
   final TextEditingController tissueStatusController = TextEditingController();
   final TextEditingController areaController = TextEditingController();
@@ -46,17 +42,42 @@ class _AddHectareState extends State<AddHectare> {
   final GlobalKey<FlipCardState> buttonFlipKey = GlobalKey<FlipCardState>();
   final GlobalKey<FlipCardState> formFlipKey = GlobalKey<FlipCardState>();
 
+  final FocusNode usageStatusNode = FocusNode();
+  final FocusNode tissueStatusNode = FocusNode();
+  final FocusNode areaNode = FocusNode();
+  final FocusNode documentTypeNode = FocusNode();
+
+  final FocusNode priceNode = FocusNode();
+  final FocusNode cityNode = FocusNode();
+  final FocusNode districtNode = FocusNode();
+  final FocusNode quarterNode = FocusNode();
+  final FocusNode alleyNode = FocusNode();
+
+  bool disabled = false;
+  bool loading = false;
+  final int flipSpeed = 1000;
+
   nextSection() {
     formFlipKey.currentState!.toggleCard();
     buttonFlipKey.currentState!.toggleCard();
+    setDisabled(true);
+    Future.delayed(Duration(milliseconds: flipSpeed), () => setDisabled(false));
   }
 
   previousSection() {
     formFlipKey.currentState!.toggleCard();
     buttonFlipKey.currentState!.toggleCard();
+    setDisabled(true);
+    Future.delayed(Duration(milliseconds: flipSpeed), () => setDisabled(false));
   }
 
   setLoading(bool dsb) {
+    setState(() {
+      loading = dsb;
+    });
+  }
+
+  setDisabled(bool dsb) {
     setState(() {
       disabled = dsb;
     });
@@ -72,6 +93,7 @@ class _AddHectareState extends State<AddHectare> {
 
   submit() async {
     setLoading(true);
+    setDisabled(true);
     Hectare data = Hectare(
       usageStatus: usageStatusController.text,
       tissueStatus: tissueStatusController.text,
@@ -109,6 +131,7 @@ class _AddHectareState extends State<AddHectare> {
     });
 
     setLoading(false);
+    setDisabled(false);
     if (res == false) return done(false);
     print(res);
     return done(true);
@@ -148,6 +171,7 @@ class _AddHectareState extends State<AddHectare> {
                     direction: FlipDirection.HORIZONTAL,
                     flipOnTouch: false,
                     key: formFlipKey,
+                    speed: flipSpeed,
                     front: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 50),
                       child: ListView(
@@ -156,10 +180,12 @@ class _AddHectareState extends State<AddHectare> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: usageStatusController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                tissueStatusNode.requestFocus();
                               },
+                              focusNode: usageStatusNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -192,10 +218,12 @@ class _AddHectareState extends State<AddHectare> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: tissueStatusController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                areaNode.requestFocus();
                               },
+                              focusNode: tissueStatusNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -227,10 +255,12 @@ class _AddHectareState extends State<AddHectare> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: areaController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                documentTypeNode.requestFocus();
                               },
+                              focusNode: areaNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -262,10 +292,12 @@ class _AddHectareState extends State<AddHectare> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: documentTypeController,
-                              textInputAction: TextInputAction.next,
+                              enabled: !disabled,
+                              textInputAction: TextInputAction.done,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                nextSection();
                               },
+                              focusNode: documentTypeNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -305,10 +337,12 @@ class _AddHectareState extends State<AddHectare> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: priceController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                cityNode.requestFocus();
                               },
+                              focusNode: priceNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -340,10 +374,12 @@ class _AddHectareState extends State<AddHectare> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: cityController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                districtNode.requestFocus();
                               },
+                              focusNode: cityNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -376,10 +412,12 @@ class _AddHectareState extends State<AddHectare> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: districtController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                quarterNode.requestFocus();
                               },
+                              focusNode: districtNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -412,10 +450,12 @@ class _AddHectareState extends State<AddHectare> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: quarterController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                alleyNode.requestFocus();
                               },
+                              focusNode: quarterNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -447,11 +487,12 @@ class _AddHectareState extends State<AddHectare> {
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
-                              controller: alleyController,
-                              textInputAction: TextInputAction.next,
+                              controller: alleyController, enabled: !disabled,
+                              textInputAction: TextInputAction.done,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                alleyNode.unfocus();
                               },
+                              focusNode: alleyNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -484,6 +525,7 @@ class _AddHectareState extends State<AddHectare> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: ChooseLocation(
                               controller: locationController,
+                              enabled: !disabled,
                             ),
                           ),
                         ],
@@ -503,18 +545,21 @@ class _AddHectareState extends State<AddHectare> {
                   direction: FlipDirection.VERTICAL,
                   flipOnTouch: false,
                   key: buttonFlipKey,
+                  speed: flipSpeed,
                   front: OccButton(
                     onPressed: () {
                       nextSection();
                     },
                     label: addContinueButtonLabel,
+                    enabled: !disabled,
                   ),
                   back: OccButton(
                     onPressed: () {
                       submit();
                     },
                     label: hectareFormTitle,
-                    loading: disabled,
+                    enabled: !disabled,
+                    loading: loading,
                   ),
                 ),
               ),

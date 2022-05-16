@@ -42,14 +42,14 @@ class OccButton extends StatelessWidget {
       );
     }
 
-    if (enabled is bool && enabled == false) {
-      _decour = const BoxDecoration(
-        color: disabledColor,
-        borderRadius: BorderRadius.all(
-          Radius.circular(50),
-        ),
-      );
-    }
+    // if (enabled is bool && enabled == false) {
+    //   _decour = const BoxDecoration(
+    //     color: disabledColor,
+    //     borderRadius: BorderRadius.all(
+    //       Radius.circular(50),
+    //     ),
+    //   );
+    // }
 
     void Function()? _onPress = onPressed;
     Widget child = Text(
@@ -59,9 +59,7 @@ class OccButton extends StatelessWidget {
         fontWeight: FontWeight.w500,
       ),
     );
-    if (enabled is bool && enabled == false) {
-      _onPress = null;
-    } else if (loading is bool && loading == true) {
+    if (loading is bool && loading == true) {
       _onPress = null;
       child = const SizedBox(
         child: CircularProgressIndicator(
@@ -71,6 +69,8 @@ class OccButton extends StatelessWidget {
         height: 25,
         width: 25,
       );
+    } else if (enabled is bool && enabled == false) {
+      _onPress = null;
     }
 
     return ClipRRect(

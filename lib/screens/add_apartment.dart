@@ -25,9 +25,7 @@ class AddApartment extends StatefulWidget {
 }
 
 class _AddApartmentState extends State<AddApartment> {
-  bool disabled = false;
-  List<String> equipments = [];
-
+  //
   final TextEditingController floorsCountController = TextEditingController();
   final TextEditingController unitsCountController = TextEditingController();
   final TextEditingController floorController = TextEditingController();
@@ -35,6 +33,7 @@ class _AddApartmentState extends State<AddApartment> {
   final TextEditingController documentTypeController = TextEditingController();
   final TextEditingController roomsCountController = TextEditingController();
   final TextEditingController mastersCountController = TextEditingController();
+  List<String> equipments = [];
 
   final TextEditingController priceController = TextEditingController();
 
@@ -48,17 +47,45 @@ class _AddApartmentState extends State<AddApartment> {
   final GlobalKey<FlipCardState> buttonFlipKey = GlobalKey<FlipCardState>();
   final GlobalKey<FlipCardState> formFlipKey = GlobalKey<FlipCardState>();
 
+  final FocusNode floorsCountNode = FocusNode();
+  final FocusNode unitsCountNode = FocusNode();
+  final FocusNode floorNode = FocusNode();
+  final FocusNode areaNode = FocusNode();
+  final FocusNode documentTypeNode = FocusNode();
+  final FocusNode roomsCountNode = FocusNode();
+  final FocusNode mastersCountNode = FocusNode();
+
+  final FocusNode priceNode = FocusNode();
+  final FocusNode cityNode = FocusNode();
+  final FocusNode districtNode = FocusNode();
+  final FocusNode quarterNode = FocusNode();
+  final FocusNode alleyNode = FocusNode();
+
+  bool disabled = false;
+  bool loading = false;
+  final int flipSpeed = 1000;
+
   nextSection() {
     formFlipKey.currentState!.toggleCard();
     buttonFlipKey.currentState!.toggleCard();
+    setDisabled(true);
+    Future.delayed(Duration(milliseconds: flipSpeed), () => setDisabled(false));
   }
 
   previousSection() {
     formFlipKey.currentState!.toggleCard();
     buttonFlipKey.currentState!.toggleCard();
+    setDisabled(true);
+    Future.delayed(Duration(milliseconds: flipSpeed), () => setDisabled(false));
   }
 
   setLoading(bool dsb) {
+    setState(() {
+      loading = dsb;
+    });
+  }
+
+  setDisabled(bool dsb) {
     setState(() {
       disabled = dsb;
     });
@@ -74,6 +101,7 @@ class _AddApartmentState extends State<AddApartment> {
 
   submit() async {
     setLoading(true);
+    setDisabled(true);
     Apartment data = Apartment(
       floorsCount: int.tryParse(floorsCountController.text),
       unitsCount: int.tryParse(unitsCountController.text),
@@ -118,6 +146,7 @@ class _AddApartmentState extends State<AddApartment> {
     });
 
     setLoading(false);
+    setDisabled(false);
     if (res == false) return done(false);
     print(res);
     return done(true);
@@ -157,6 +186,7 @@ class _AddApartmentState extends State<AddApartment> {
                     direction: FlipDirection.HORIZONTAL,
                     flipOnTouch: false,
                     key: formFlipKey,
+                    speed: flipSpeed,
                     front: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 50),
                       child: ListView(
@@ -165,10 +195,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: floorsCountController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                unitsCountNode.requestFocus();
                               },
+                              focusNode: floorsCountNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -200,10 +232,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: unitsCountController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                floorNode.requestFocus();
                               },
+                              focusNode: unitsCountNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -235,10 +269,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: floorController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                areaNode.requestFocus();
                               },
+                              focusNode: floorNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -270,10 +306,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: areaController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                documentTypeNode.requestFocus();
                               },
+                              focusNode: areaNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -305,10 +343,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: documentTypeController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                roomsCountNode.requestFocus();
                               },
+                              focusNode: documentTypeNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -341,10 +381,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: roomsCountController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                mastersCountNode.requestFocus();
                               },
+                              focusNode: roomsCountNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -376,10 +418,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: mastersCountController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.done,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                mastersCountNode.unfocus();
                               },
+                              focusNode: mastersCountNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -408,24 +452,26 @@ class _AddApartmentState extends State<AddApartment> {
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             child: OccSelectList(
-                                items: const [
-                                  "انباری",
-                                  "پارکینگ",
-                                  "آسانسور",
-                                  "سونا",
-                                  "جکوزی",
-                                  "مبله",
-                                  "کمد دیواری",
-                                  "ویو"
-                                ],
-                                active: equipments,
-                                setActive: (t) {
-                                  setState(() {
-                                    equipments = t;
-                                  });
-                                }),
+                              items: const [
+                                "انباری",
+                                "پارکینگ",
+                                "آسانسور",
+                                "سونا",
+                                "جکوزی",
+                                "مبله",
+                                "کمد دیواری",
+                                "ویو"
+                              ],
+                              active: equipments,
+                              setActive: (t) {
+                                setState(() {
+                                  equipments = t;
+                                });
+                              },
+                              enabled: !disabled,
+                            ),
                           ),
                         ],
                       ),
@@ -438,10 +484,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: priceController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                cityNode.requestFocus();
                               },
+                              focusNode: priceNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -473,10 +521,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: cityController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                districtNode.requestFocus();
                               },
+                              focusNode: cityNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -509,10 +559,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: districtController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                quarterNode.requestFocus();
                               },
+                              focusNode: districtNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -545,10 +597,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: quarterController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                alleyNode.requestFocus();
                               },
+                              focusNode: quarterNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -581,10 +635,12 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: alleyController,
-                              textInputAction: TextInputAction.next,
+                              enabled: !disabled,
+                              textInputAction: TextInputAction.done,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                alleyNode.unfocus();
                               },
+                              focusNode: alleyNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -617,6 +673,7 @@ class _AddApartmentState extends State<AddApartment> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: ChooseLocation(
                               controller: locationController,
+                              enabled: !disabled,
                             ),
                           ),
                         ],
@@ -636,18 +693,21 @@ class _AddApartmentState extends State<AddApartment> {
                   direction: FlipDirection.VERTICAL,
                   flipOnTouch: false,
                   key: buttonFlipKey,
+                  speed: flipSpeed,
                   front: OccButton(
                     onPressed: () {
                       nextSection();
                     },
                     label: addContinueButtonLabel,
+                    enabled: !disabled,
                   ),
                   back: OccButton(
                     onPressed: () {
                       submit();
                     },
                     label: apartmentFormTitle,
-                    loading: disabled,
+                    enabled: !disabled,
+                    loading: loading,
                   ),
                 ),
               ),

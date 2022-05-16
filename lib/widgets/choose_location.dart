@@ -8,9 +8,14 @@ import 'package:latlong2/latlong.dart' as latLng;
 import 'package:geolocator/geolocator.dart';
 
 class ChooseLocation extends StatefulWidget {
-  const ChooseLocation({Key? key, this.controller}) : super(key: key);
+  const ChooseLocation({
+    Key? key,
+    this.controller,
+    this.enabled,
+  }) : super(key: key);
 
   final MapController? controller;
+  final bool? enabled;
 
   @override
   _ChooseLocationState createState() => _ChooseLocationState();
@@ -149,17 +154,23 @@ class _ChooseLocationState extends State<ChooseLocation> {
 
   @override
   Widget build(BuildContext context) {
+    //
+    dynamic map = _MapContent(
+      controller: _mapController,
+      fullScreen: fullScreen,
+      center: latLng.LatLng(35.6973918, 51.3476617),
+    );
+    // if (widget.enabled is bool && widget.enabled == false) {
+    //   map = AbsorbPointer(child: map);
+    // }
+
     return SizedBox(
       height: 200,
       child: ClipRRect(
         borderRadius: const BorderRadius.all(
           Radius.circular(30),
         ),
-        child: _MapContent(
-          controller: _mapController,
-          fullScreen: fullScreen,
-          center: latLng.LatLng(35.6973918, 51.3476617),
-        ),
+        child: map,
       ),
     );
     // return ;

@@ -23,8 +23,6 @@ class AddVilla extends StatefulWidget {
 }
 
 class _AddVillaState extends State<AddVilla> {
-  bool disabled = false;
-
   final TextEditingController typeController = TextEditingController();
   final TextEditingController landAreaController = TextEditingController();
   final TextEditingController buildingAreaController = TextEditingController();
@@ -46,17 +44,45 @@ class _AddVillaState extends State<AddVilla> {
   final GlobalKey<FlipCardState> buttonFlipKey = GlobalKey<FlipCardState>();
   final GlobalKey<FlipCardState> formFlipKey = GlobalKey<FlipCardState>();
 
+  bool disabled = false;
+  bool loading = false;
+  final int flipSpeed = 1000;
+
+  final FocusNode typeNode = FocusNode();
+  final FocusNode landAreaNode = FocusNode();
+  final FocusNode buildingAreaNode = FocusNode();
+  final FocusNode constructionYearNode = FocusNode();
+  final FocusNode documentTypeNode = FocusNode();
+  final FocusNode roomsCountNode = FocusNode();
+  final FocusNode mastersCountNode = FocusNode();
+
+  final FocusNode priceNode = FocusNode();
+  final FocusNode cityNode = FocusNode();
+  final FocusNode districtNode = FocusNode();
+  final FocusNode quarterNode = FocusNode();
+  final FocusNode alleyNode = FocusNode();
+
   nextSection() {
     formFlipKey.currentState!.toggleCard();
     buttonFlipKey.currentState!.toggleCard();
+    setDisabled(true);
+    Future.delayed(Duration(milliseconds: flipSpeed), () => setDisabled(false));
   }
 
   previousSection() {
     formFlipKey.currentState!.toggleCard();
     buttonFlipKey.currentState!.toggleCard();
+    setDisabled(true);
+    Future.delayed(Duration(milliseconds: flipSpeed), () => setDisabled(false));
   }
 
   setLoading(bool dsb) {
+    setState(() {
+      loading = dsb;
+    });
+  }
+
+  setDisabled(bool dsb) {
     setState(() {
       disabled = dsb;
     });
@@ -72,6 +98,7 @@ class _AddVillaState extends State<AddVilla> {
 
   submit() async {
     setLoading(true);
+    setDisabled(true);
     Villa data = Villa(
       type: typeController.text,
       landArea: double.tryParse(landAreaController.text),
@@ -112,6 +139,7 @@ class _AddVillaState extends State<AddVilla> {
     });
 
     setLoading(false);
+    setDisabled(false);
     if (res == false) return done(false);
     print(res);
     return done(true);
@@ -151,6 +179,7 @@ class _AddVillaState extends State<AddVilla> {
                     direction: FlipDirection.HORIZONTAL,
                     flipOnTouch: false,
                     key: formFlipKey,
+                    speed: flipSpeed,
                     front: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 50),
                       child: ListView(
@@ -159,10 +188,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: typeController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                landAreaNode.requestFocus();
                               },
+                              focusNode: typeNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -195,10 +226,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: landAreaController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                buildingAreaNode.requestFocus();
                               },
+                              focusNode: landAreaNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -230,10 +263,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: buildingAreaController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                constructionYearNode.requestFocus();
                               },
+                              focusNode: buildingAreaNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -265,10 +300,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: constructionYearController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                documentTypeNode.requestFocus();
                               },
+                              focusNode: constructionYearNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -300,10 +337,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: documentTypeController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                roomsCountNode.requestFocus();
                               },
+                              focusNode: documentTypeNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -336,10 +375,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: roomsCountController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                mastersCountNode.requestFocus();
                               },
+                              focusNode: roomsCountNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -371,10 +412,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: mastersCountController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.done,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                nextSection();
                               },
+                              focusNode: mastersCountNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -413,10 +456,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: priceController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                cityNode.requestFocus();
                               },
+                              focusNode: priceNode,
                               textAlign: TextAlign.left,
                               textDirection: TextDirection.ltr,
                               enableSuggestions: false,
@@ -448,10 +493,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: cityController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                districtNode.requestFocus();
                               },
+                              focusNode: cityNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -484,10 +531,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: districtController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                quarterNode.requestFocus();
                               },
+                              focusNode: districtNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -520,10 +569,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: quarterController,
+                              enabled: !disabled,
                               textInputAction: TextInputAction.next,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                alleyNode.requestFocus();
                               },
+                              focusNode: quarterNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -556,10 +607,12 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
                               controller: alleyController,
-                              textInputAction: TextInputAction.next,
+                              enabled: !disabled,
+                              textInputAction: TextInputAction.done,
                               onEditingComplete: () {
-                                // FocusScope.of(context).requestFocus(passwordNode);
+                                alleyNode.unfocus();
                               },
+                              focusNode: alleyNode,
                               // textAlign: TextAlign.left,
                               // textDirection: TextDirection.ltr,
                               enableSuggestions: true,
@@ -592,6 +645,7 @@ class _AddVillaState extends State<AddVilla> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: ChooseLocation(
                               controller: locationController,
+                              enabled: !disabled,
                             ),
                           ),
                         ],
@@ -611,18 +665,21 @@ class _AddVillaState extends State<AddVilla> {
                   direction: FlipDirection.VERTICAL,
                   flipOnTouch: false,
                   key: buttonFlipKey,
+                  speed: flipSpeed,
                   front: OccButton(
                     onPressed: () {
                       nextSection();
                     },
                     label: addContinueButtonLabel,
+                    enabled: !disabled,
                   ),
                   back: OccButton(
                     onPressed: () {
                       submit();
                     },
                     label: villaFormTitle,
-                    loading: disabled,
+                    enabled: !disabled,
+                    loading: loading,
                   ),
                 ),
               ),
