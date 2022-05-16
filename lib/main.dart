@@ -77,7 +77,7 @@ class _RootAppState extends State<RootApp> {
 
   // check token valid
   Future<bool> isValid() async {
-    // await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
     String? token = await getAuthToken();
     if (token is String) {
       dynamic result =
