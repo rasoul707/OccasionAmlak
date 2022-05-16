@@ -471,6 +471,7 @@ class _AddApartmentState extends State<AddApartment> {
                                 });
                               },
                               enabled: !disabled,
+                              multiple: true,
                             ),
                           ),
                         ],

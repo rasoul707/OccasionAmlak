@@ -8,12 +8,14 @@ class OccSelectList extends StatelessWidget {
     required this.active,
     required this.setActive,
     this.enabled,
+    this.multiple,
   }) : super(key: key);
 
   final List<String> items;
-  final List<String> active;
-  final void Function(List<String>) setActive;
+  final dynamic active;
+  final void Function(dynamic) setActive;
   final bool? enabled;
+  final bool? multiple;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,23 @@ class OccSelectList extends StatelessWidget {
       ),
     );
 
+    void _onTap(String label) {
+      if (multiple!) {
+        if (active.contains(label)) {
+          active.remove(label);
+        } else {
+          active.add(label);
+        }
+        setActive(active);
+      } else {
+        if (active == label) {
+          setActive("");
+        } else {
+          setActive(label);
+        }
+      }
+    }
+
     Widget item(String label, bool isActive) {
       return GestureDetector(
         child: Container(
@@ -55,16 +74,7 @@ class OccSelectList extends StatelessWidget {
           // color: textFieldBgColor,
           decoration: isActive ? activeDecor : normalDecor,
         ),
-        onTap: () {
-          print(label);
-          final m = active;
-          if (m.contains(label)) {
-            m.remove(label);
-          } else {
-            m.add(label);
-          }
-          setActive(m);
-        },
+        onTap: () => _onTap(label),
       );
     }
 
