@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/occselectlist.dart';
 import 'file_added_result.dart';
 
 import 'package:flutter_map/flutter_map.dart';
@@ -62,6 +63,8 @@ class _AddVillaState extends State<AddVilla> {
   final FocusNode quarterNode = FocusNode();
   final FocusNode alleyNode = FocusNode();
 
+  String type = "";
+
   nextSection() {
     formFlipKey.currentState!.toggleCard();
     buttonFlipKey.currentState!.toggleCard();
@@ -100,7 +103,7 @@ class _AddVillaState extends State<AddVilla> {
     setLoading(true);
     setDisabled(true);
     Villa data = Villa(
-      type: typeController.text,
+      type: type,
       landArea: double.tryParse(landAreaController.text),
       buildingArea: double.tryParse(buildingAreaController.text),
       constructionYear: int.tryParse(constructionYearController.text),
@@ -186,42 +189,60 @@ class _AddVillaState extends State<AddVilla> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: typeController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                landAreaNode.requestFocus();
+                            child: OccSelectList(
+                              items: const [
+                                "فلت",
+                                "دوبلکس",
+                                "تریبلکس",
+                                "طبقات جداگانه"
+                              ],
+                              active: type,
+                              setActive: (t) {
+                                setState(() {
+                                  type = t;
+                                });
                               },
-                              focusNode: typeNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_type,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
+                              enabled: !disabled,
                             ),
                           ),
+                          // Padding(
+                          //   padding: const EdgeInsets.symmetric(vertical: 10),
+                          //   child: TextFormField(
+                          //     controller: typeController,
+                          //     enabled: !disabled,
+                          //     textInputAction: TextInputAction.next,
+                          //     onEditingComplete: () {
+                          //       landAreaNode.requestFocus();
+                          //     },
+                          //     focusNode: typeNode,
+                          //     // textAlign: TextAlign.left,
+                          //     // textDirection: TextDirection.ltr,
+                          //     enableSuggestions: true,
+                          //     autocorrect: true,
+                          //     keyboardType: TextInputType.text,
+                          //     decoration: const InputDecoration(
+                          //       labelText: villaFormLabels_type,
+                          //       floatingLabelBehavior:
+                          //           FloatingLabelBehavior.always,
+                          //       filled: true,
+                          //       border: OutlineInputBorder(
+                          //         borderSide: BorderSide.none,
+                          //         borderRadius: BorderRadius.all(
+                          //           Radius.circular(50),
+                          //         ),
+                          //       ),
+                          //       fillColor: textFieldBgColor,
+                          //       focusColor: textColor,
+                          //       labelStyle: TextStyle(
+                          //         color: textColor,
+                          //       ),
+                          //       contentPadding:
+                          //           EdgeInsets.symmetric(horizontal: 25),
+                          //     ),
+                          //     style: const TextStyle(color: textColor),
+                          //   ),
+                          // ),
+
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(

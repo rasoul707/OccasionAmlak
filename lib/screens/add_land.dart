@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/land.dart';
+import '../widgets/occselectlist.dart';
 import 'file_added_result.dart';
 
 import 'package:flutter_map/flutter_map.dart';
@@ -52,6 +53,9 @@ class _AddLandState extends State<AddLand> {
   final FocusNode quarterNode = FocusNode();
   final FocusNode alleyNode = FocusNode();
 
+  String usageStatus = "";
+  String tissueStatus = "";
+
   bool disabled = false;
   bool loading = false;
   final int flipSpeed = 1000;
@@ -94,8 +98,8 @@ class _AddLandState extends State<AddLand> {
     setLoading(true);
     setDisabled(true);
     Land data = Land(
-      usageStatus: usageStatusController.text,
-      tissueStatus: tissueStatusController.text,
+      usageStatus: usageStatus,
+      tissueStatus: tissueStatus,
       area: double.tryParse(areaController.text),
       documentType: documentTypeController.text,
       //
@@ -177,79 +181,116 @@ class _AddLandState extends State<AddLand> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: usageStatusController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                tissueStatusNode.requestFocus();
+                            child: OccSelectList(
+                              items: const [
+                                "مسکونی",
+                                "زراعی و کشاورزی",
+                                "جنگل جلگه ای",
+                                "اداری و تجاری",
+                              ],
+                              active: usageStatus,
+                              setActive: (t) {
+                                setState(() {
+                                  usageStatus = t;
+                                });
                               },
-                              focusNode: usageStatusNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: landFormLabels_usageStatus,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
+                              enabled: !disabled,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: tissueStatusController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                areaNode.requestFocus();
+                            child: OccSelectList(
+                              items: const [
+                                "داخل بافت",
+                                "الحاق به بافت",
+                                "خارج بافت"
+                              ],
+                              active: tissueStatus,
+                              setActive: (t) {
+                                setState(() {
+                                  tissueStatus = t;
+                                });
                               },
-                              focusNode: tissueStatusNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-                              decoration: const InputDecoration(
-                                labelText: landFormLabels_tissueStatus,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
+                              enabled: !disabled,
                             ),
                           ),
+
+                          // Padding(
+                          //   padding: const EdgeInsets.symmetric(vertical: 10),
+                          //   child: TextFormField(
+                          //     controller: usageStatusController,
+                          //     enabled: !disabled,
+                          //     textInputAction: TextInputAction.next,
+                          //     onEditingComplete: () {
+                          //       tissueStatusNode.requestFocus();
+                          //     },
+                          //     focusNode: usageStatusNode,
+                          //     // textAlign: TextAlign.left,
+                          //     // textDirection: TextDirection.ltr,
+                          //     enableSuggestions: true,
+                          //     autocorrect: true,
+                          //     keyboardType: TextInputType.text,
+
+                          //     decoration: const InputDecoration(
+                          //       labelText: landFormLabels_usageStatus,
+                          //       floatingLabelBehavior:
+                          //           FloatingLabelBehavior.always,
+                          //       filled: true,
+                          //       border: OutlineInputBorder(
+                          //         borderSide: BorderSide.none,
+                          //         borderRadius: BorderRadius.all(
+                          //           Radius.circular(50),
+                          //         ),
+                          //       ),
+                          //       fillColor: textFieldBgColor,
+                          //       focusColor: textColor,
+                          //       labelStyle: TextStyle(
+                          //         color: textColor,
+                          //       ),
+                          //       contentPadding:
+                          //           EdgeInsets.symmetric(horizontal: 25),
+                          //     ),
+                          //     style: const TextStyle(color: textColor),
+                          //   ),
+                          // ),
+                          // Padding(
+                          //   padding: const EdgeInsets.symmetric(vertical: 10),
+                          //   child: TextFormField(
+                          //     controller: tissueStatusController,
+                          //     enabled: !disabled,
+                          //     textInputAction: TextInputAction.next,
+                          //     onEditingComplete: () {
+                          //       areaNode.requestFocus();
+                          //     },
+                          //     focusNode: tissueStatusNode,
+                          //     // textAlign: TextAlign.left,
+                          //     // textDirection: TextDirection.ltr,
+                          //     enableSuggestions: true,
+                          //     autocorrect: true,
+                          //     keyboardType: TextInputType.text,
+                          //     decoration: const InputDecoration(
+                          //       labelText: landFormLabels_tissueStatus,
+                          //       floatingLabelBehavior:
+                          //           FloatingLabelBehavior.always,
+                          //       filled: true,
+                          //       border: OutlineInputBorder(
+                          //         borderSide: BorderSide.none,
+                          //         borderRadius: BorderRadius.all(
+                          //           Radius.circular(50),
+                          //         ),
+                          //       ),
+                          //       fillColor: textFieldBgColor,
+                          //       focusColor: textColor,
+                          //       labelStyle: TextStyle(
+                          //         color: textColor,
+                          //       ),
+                          //       contentPadding:
+                          //           EdgeInsets.symmetric(horizontal: 25),
+                          //     ),
+                          //     style: const TextStyle(color: textColor),
+                          //   ),
+                          // ),
+
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(

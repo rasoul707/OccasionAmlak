@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/commercial.dart';
+import '../widgets/occselectlist.dart';
 import 'file_added_result.dart';
 
 import 'package:flutter_map/flutter_map.dart';
@@ -54,6 +55,8 @@ class _AddCommercialState extends State<AddCommercial> {
   final FocusNode quarterNode = FocusNode();
   final FocusNode alleyNode = FocusNode();
 
+  String type = "";
+
   bool disabled = false;
   bool loading = false;
   final int flipSpeed = 1000;
@@ -96,7 +99,7 @@ class _AddCommercialState extends State<AddCommercial> {
     setLoading(true);
     setDisabled(true);
     Commercial data = Commercial(
-      type: typeController.text,
+      type: type,
       area: double.tryParse(areaController.text),
       documentType: documentTypeController.text,
       floor: int.tryParse(floorController.text),
@@ -180,42 +183,62 @@ class _AddCommercialState extends State<AddCommercial> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: typeController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                FocusScope.of(context).requestFocus(areaNode);
+                            child: OccSelectList(
+                              items: const [
+                                "اداری",
+                                "تجاری",
+                                "مغازه",
+                                "صنعتی",
+                                "دامداری و کشاورزی"
+                              ],
+                              active: type,
+                              setActive: (t) {
+                                setState(() {
+                                  type = t;
+                                });
                               },
-                              focusNode: typeNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: commercialFormLabels_type,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
+                              enabled: !disabled,
                             ),
                           ),
+                          // Padding(
+                          //   padding: const EdgeInsets.symmetric(vertical: 10),
+                          //   child: TextFormField(
+                          //     controller: typeController,
+                          //     enabled: !disabled,
+                          //     textInputAction: TextInputAction.next,
+                          //     onEditingComplete: () {
+                          //       FocusScope.of(context).requestFocus(areaNode);
+                          //     },
+                          //     focusNode: typeNode,
+                          //     // textAlign: TextAlign.left,
+                          //     // textDirection: TextDirection.ltr,
+                          //     enableSuggestions: true,
+                          //     autocorrect: true,
+                          //     keyboardType: TextInputType.text,
+
+                          //     decoration: const InputDecoration(
+                          //       labelText: commercialFormLabels_type,
+                          //       floatingLabelBehavior:
+                          //           FloatingLabelBehavior.always,
+                          //       filled: true,
+                          //       border: OutlineInputBorder(
+                          //         borderSide: BorderSide.none,
+                          //         borderRadius: BorderRadius.all(
+                          //           Radius.circular(50),
+                          //         ),
+                          //       ),
+                          //       fillColor: textFieldBgColor,
+                          //       focusColor: textColor,
+                          //       labelStyle: TextStyle(
+                          //         color: textColor,
+                          //       ),
+                          //       contentPadding:
+                          //           EdgeInsets.symmetric(horizontal: 25),
+                          //     ),
+                          //     style: const TextStyle(color: textColor),
+                          //   ),
+                          // ),
+
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: TextFormField(
