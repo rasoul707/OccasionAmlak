@@ -1,4 +1,4 @@
-package com.example.occapp
+package ir.occasion.app
 
 import io.flutter.embedding.android.FlutterActivity
 

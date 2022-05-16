@@ -80,11 +80,11 @@ class _RootAppState extends State<RootApp> {
     // await Future.delayed(const Duration(seconds: 3));
     String? token = await getAuthToken();
     if (token is String) {
-      String result =
+      dynamic result =
           await API(Dio(BaseOptions(headers: {"Authorization": token})))
               .validate()
-              .catchError((Object obj) => "hasError");
-      if (result != "hasError") return true;
+              .catchError((Object obj) => false);
+      if (result != false) return true;
     }
     return false;
   }

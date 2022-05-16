@@ -46,7 +46,7 @@ const hectareFormTitle = "ثبت هکتاری";
 const addContinueButtonLabel = "ثبت و ادامه";
 
 const setMapPointLabel = "ثبت این نقطه";
-const currentLocationLabel = "موقعیت فعلی";
+const currentLocationLabel = "موقعیت فعلی من";
 
 //
 //
@@ -85,8 +85,8 @@ const apartmentFormLabels_price = "قیمت";
 //
 //
 
-const landFormLabels_floorsCount = "وضعیت کاربری";
-const landFormLabels_floor = "وضعیت بافت";
+const landFormLabels_usageStatus = "وضعیت کاربری";
+const landFormLabels_tissueStatus = "وضعیت بافت";
 const landFormLabels_area = "متراژ";
 const landFormLabels_documentType = "نوع سند";
 
@@ -99,7 +99,7 @@ const landFormLabels_price = "قیمت";
 //
 //
 
-const commercialFormLabels_floorsCount = "نوع ملک";
+const commercialFormLabels_type = "نوع ملک";
 const commercialFormLabels_area = "متراژ";
 const commercialFormLabels_documentType = "نوع سند";
 const commercialFormLabels_floor = "طبقه ملک";
@@ -114,8 +114,8 @@ const commercialFormLabels_price = "قیمت";
 //
 //
 
-const hectareFormLabels_floorsCount = "وضعیت کاربری";
-const hectareFormLabels_floor = "وضعیت بافت";
+const hectareFormLabels_usageStatus = "وضعیت کاربری";
+const hectareFormLabels_tissueStatus = "وضعیت بافت";
 const hectareFormLabels_area = "متراژ";
 const hectareFormLabels_documentType = "نوع سند";
 
