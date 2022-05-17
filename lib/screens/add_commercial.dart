@@ -88,10 +88,9 @@ class _AddCommercialState extends State<AddCommercial> {
   }
 
   done(bool success) {
-    Navigator.pushAndRemoveUntil(
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => FileAddedResult(success)),
-      (Route<dynamic> route) => route.isFirst,
     );
   }
 

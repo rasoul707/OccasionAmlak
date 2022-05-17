@@ -67,6 +67,7 @@ class _DashContentState extends State<DashContent> {
 
   @override
   Widget build(BuildContext context) {
+    print("dash");
     return FutureBuilder<User>(
       future: readUserData(),
       builder: (context, snapshot) {

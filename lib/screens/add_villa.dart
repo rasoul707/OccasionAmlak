@@ -92,10 +92,9 @@ class _AddVillaState extends State<AddVilla> {
   }
 
   done(bool success) {
-    Navigator.pushAndRemoveUntil(
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => FileAddedResult(success)),
-      (Route<dynamic> route) => route.isFirst,
     );
   }
 

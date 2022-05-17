@@ -25,57 +25,66 @@ class FileAddedResult extends StatelessWidget {
     }
 
     backToHome() {
-      Navigator.pop(context);
+      Navigator.popUntil(
+        context,
+        (Route<dynamic> route) => route.isFirst,
+      );
     }
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 50),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Spacer(),
-                Image(
-                  image: AssetImage("assets/images/" + imgSrc + ".png"),
-                  width: 235,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 24,
-                      color: textColor,
+    return WillPopScope(
+      onWillPop: () async {
+        backToHome();
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: bgColor,
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Spacer(),
+                  Image(
+                    image: AssetImage("assets/images/" + imgSrc + ".png"),
+                    width: 235,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 24,
+                        color: textColor,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Text(
-                    subTitle,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w300,
-                      fontSize: 14,
-                      color: textColor,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Text(
+                      subTitle,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 14,
+                        color: textColor,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 40),
-                  child: OccButton(
-                    onPressed: backToHome,
-                    label: back2HomeButtonLabel,
-                    type: 'cancel',
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: OccButton(
+                      onPressed: backToHome,
+                      label: back2HomeButtonLabel,
+                      type: 'cancel',
+                    ),
                   ),
-                ),
-                const Spacer(),
-              ],
+                  const Spacer(),
+                ],
+              ),
             ),
           ),
         ),

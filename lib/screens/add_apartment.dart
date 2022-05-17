@@ -91,11 +91,10 @@ class _AddApartmentState extends State<AddApartment> {
     });
   }
 
-  done(bool success) {
-    Navigator.pushAndRemoveUntil(
+done(bool success) {
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => FileAddedResult(success)),
-      (Route<dynamic> route) => route.isFirst,
     );
   }
 
