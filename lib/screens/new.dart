@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'add_file.dart';
 
 import '../data/colors.dart';
@@ -30,7 +31,12 @@ class NewFile extends StatelessWidget {
                   onTap: () => {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AddFile(index)),
+                      PageTransition(
+                        type: PageTransitionType.scale,
+                        duration: const Duration(seconds: 1),
+                        alignment: Alignment.center,
+                        child: AddFile(index),
+                      ),
                     )
                   },
                   child: OccCard(head: fileTypes[index]),

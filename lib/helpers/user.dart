@@ -5,6 +5,7 @@ import '../models/user.dart';
 Future<User> saveUserData(User user) async {
   SharedPreferences localStorage = await SharedPreferences.getInstance();
 
+  localStorage.setInt("id", user.id!);
   localStorage.setString("firstName", user.firstName!);
   localStorage.setString("lastName", user.lastName!);
   localStorage.setString("email", user.email!);
@@ -21,6 +22,7 @@ Future<User> readUserData() async {
   SharedPreferences localStorage = await SharedPreferences.getInstance();
 
   return User(
+    id: localStorage.getInt("id"),
     firstName: localStorage.getString("firstName"),
     lastName: localStorage.getString("lastName"),
     email: localStorage.getString("email"),
@@ -35,6 +37,7 @@ Future<User> readUserData() async {
 Future<bool> removeUserData() async {
   SharedPreferences localStorage = await SharedPreferences.getInstance();
 
+  localStorage.remove("id");
   localStorage.remove("firstName");
   localStorage.remove("lastName");
   localStorage.remove("email");
@@ -47,6 +50,11 @@ Future<bool> removeUserData() async {
   return true;
 }
 
+Future<bool> hasUserData() async {
+  SharedPreferences localStorage = await SharedPreferences.getInstance();
+  return localStorage.getInt("id") != null;
+}
+
 //
 //
 
@@ -56,11 +64,11 @@ Future<String> setAuthToken(String token) async {
   return token;
 }
 
-Future<String?> getAuthToken() async {
+Future<String> getAuthToken() async {
   SharedPreferences localStorage = await SharedPreferences.getInstance();
   String? m = localStorage.getString("authToken");
   if (m is String) return 'Bearer ' + m;
-  return null;
+  return '';
 }
 
 Future<bool> removeAuthToken() async {

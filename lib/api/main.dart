@@ -18,7 +18,7 @@ abstract class API {
   Future<LoginRes> login(@Body() LoginReq loginReq);
 
   @POST("jwt-auth/v1/token/validate")
-  Future<dynamic> validate();
+  Future<String> validate();
 
   @GET("rapp/v1/getMe")
   Future<User> getMe();

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:occasionapp/api/services.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../data/colors.dart';
 import '../data/strings.dart';
@@ -9,11 +11,11 @@ import '../widgets/occButton.dart';
 import '../api/main.dart';
 import '../models/user.dart';
 import '../helpers/user.dart';
+import '../widgets/occsnackbar.dart';
+import 'dash.dart';
 
 class AuthContent extends StatefulWidget {
-  const AuthContent(this.reloadMain, {Key? key}) : super(key: key);
-
-  final void Function() reloadMain;
+  const AuthContent({Key? key}) : super(key: key);
 
   @override
   _AuthContentState createState() => _AuthContentState();
@@ -46,44 +48,38 @@ class _AuthContentState extends State<AuthContent> {
     });
     String username = usernameController.text;
     String password = passwordController.text;
+    final LoginReq req = LoginReq(username: username, password: password);
 
-    LoginRes result = await API(Dio())
-        .login(LoginReq(username: username, password: password))
-        .catchError((Object obj) {
-      if (obj.runtimeType == DioError) {
-        final res = (obj as DioError).response;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            res!.data['code'],
-            style: const TextStyle(fontFamily: 'Vazir', color: whiteTextColor),
-          ),
-          backgroundColor: errorColor,
-          duration: const Duration(seconds: 1),
-        ));
-      }
-      return LoginRes(token: null);
-    });
+    // error action
+    ErrorAction _err = ErrorAction(
+      response: (r) {
+        OccSnackBar.error(context, r.data['code']);
+      },
+      connection: () {
+        OccSnackBar.error(context, "دستگاه به اینترنت متصل نیست!");
+      },
+    );
 
-    if (result.token is String) {
-      await setAuthToken(result.token!);
-      await saveUserData(result.user!);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text(
-          loginSuccessText,
-          style: TextStyle(fontFamily: 'Vazir', color: whiteTextColor),
-        ),
-        backgroundColor: successColor,
-        duration: Duration(seconds: 1),
-      ));
-    } else {
-      await removeAuthToken();
-      await removeUserData();
+    LoginRes _result = await Services.login(req, _err);
+
+    // okay
+    if (_result.token != null) {
+      await setAuthToken(_result.token!);
+      await saveUserData(_result.user!);
+      Navigator.pushReplacement(
+        context,
+        PageTransition(
+            type: PageTransitionType.scale,
+            duration: const Duration(seconds: 1),
+            alignment: Alignment.center,
+            child: const DashContent()),
+      );
     }
+
+    // finish
     setState(() {
       disabled = false;
     });
-
-    widget.reloadMain();
   }
 
   @override

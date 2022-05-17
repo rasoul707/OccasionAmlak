@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:occasionapp/data/colors.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:theme_mode_handler/theme_mode_handler.dart';
-import 'package:dio/dio.dart';
 
+import 'api/services.dart';
 import 'data/strings.dart';
 
+import 'helpers/user.dart';
 import 'screens/splash.dart';
 import 'screens/auth.dart';
 import 'screens/dash.dart';
 
+import 'widgets/occsnackbar.dart';
 import 'widgets/theme.dart';
-
-import 'api/main.dart';
-import 'helpers/user.dart';
 
 void main() {
   debugPaintSizeEnabled = false;
@@ -73,41 +74,54 @@ class _RootAppState extends State<RootApp> {
   @override
   void initState() {
     super.initState();
+    authentication();
   }
 
   // check token valid
-  Future<bool> isValid() async {
-    await Future.delayed(const Duration(seconds: 2));
-    String? token = await getAuthToken();
-    if (token is String) {
-      dynamic result =
-          await API(Dio(BaseOptions(headers: {"Authorization": token})))
-              .validate()
-              .catchError((Object obj) => false);
-      if (result != false) return true;
-    }
-    return false;
+  Future<void> authentication() async {
+    bool showDashboard = false;
+    bool hasUser = await hasUserData();
+
+    // error action
+
+    ErrorAction _err = ErrorAction(
+      response: (r) {
+        showDashboard = false;
+      },
+      connection: () async {
+        if (hasUser) {
+          OccSnackBar.error(context, "دستگاه به اینترنت متصل نیست!");
+          showDashboard = true;
+        } else {
+          showDashboard = false;
+        }
+      },
+      cancel: () {
+        showDashboard = true;
+      },
+    );
+
+    String _result = await Services.authentication(_err);
+
+    // okay
+    if (_result.isNotEmpty) showDashboard = true;
+
+    // finish
+    Navigator.pushReplacement(
+      context,
+      PageTransition(
+        type: PageTransitionType.scale,
+        duration: const Duration(seconds: 1),
+        alignment: Alignment.center,
+        child: (showDashboard && hasUser)
+            ? const DashContent()
+            : const AuthContent(),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: isValid(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          switch (snapshot.data!) {
-            case true:
-              return DashContent(reload);
-            case false:
-              return AuthContent(reload);
-          }
-          return const SplashScreen();
-        } else if (snapshot.hasError) {
-          return const SplashScreen();
-        } else {
-          return const SplashScreen();
-        }
-      },
-    );
+    return const SplashScreen();
   }
 }

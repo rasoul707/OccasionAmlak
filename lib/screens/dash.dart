@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:page_transition/page_transition.dart';
 
+import '../api/services.dart';
 import '../data/colors.dart';
 import '../data/strings.dart';
 
@@ -13,11 +15,10 @@ import '../models/user.dart';
 import '../helpers/user.dart';
 
 import '../screens/new.dart';
+import '../widgets/occsnackbar.dart';
 
 class DashContent extends StatefulWidget {
-  const DashContent(this.reloadMain, {Key? key}) : super(key: key);
-
-  final void Function() reloadMain;
+  const DashContent({Key? key}) : super(key: key);
 
   @override
   _DashContentState createState() => _DashContentState();
@@ -43,31 +44,36 @@ class _DashContentState extends State<DashContent> {
   addNewFile() async {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const NewFile()),
+      PageTransition(
+        type: PageTransitionType.rightToLeft,
+        child: const NewFile(),
+      ),
     ).then((_) => updateUserData());
   }
 
   // update user data
   Future<void> updateUserData() async {
-    String? token = await getAuthToken();
-    User result = await API(Dio(BaseOptions(headers: {"Authorization": token})))
-        .getMe()
-        .catchError((Object obj) {
-      if (obj.runtimeType == DioError) {
-        final res = (obj as DioError).response;
-        print(res!.data);
-      }
-      return User();
-    });
-    if (result.id != null) {
-      await saveUserData(result);
+    // error action
+    ErrorAction _err = ErrorAction(
+      response: (r) {
+        OccSnackBar.error(context, r.data['code']);
+      },
+      connection: () {
+        OccSnackBar.error(context, "دستگاه به اینترنت متصل نیست!");
+      },
+    );
+
+    User _result = await Services.getMe(_err);
+
+    // okay
+    if (_result.id != null) {
+      await saveUserData(_result);
       reload();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    print("dash");
     return FutureBuilder<User>(
       future: readUserData(),
       builder: (context, snapshot) {

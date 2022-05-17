@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../api/services.dart';
 import '../widgets/occselectlist.dart';
+import '../widgets/occsnackbar.dart';
 import 'file_added_result.dart';
 
 import 'package:flutter_map/flutter_map.dart';
@@ -122,29 +124,32 @@ class _AddVillaState extends State<AddVilla> {
       ],
     );
 
-    String? token = await getAuthToken();
-    dynamic res = await API(Dio(BaseOptions(headers: {"Authorization": token})))
-        .addVilla(data)
-        .catchError((Object obj) {
-      if (obj.runtimeType == DioError) {
-        final res = (obj as DioError).response;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            res!.data['code'],
-            style: const TextStyle(fontFamily: 'Vazir', color: whiteTextColor),
-          ),
-          backgroundColor: errorColor,
-          duration: const Duration(seconds: 1),
-        ));
-      }
-      return false;
-    });
+    // error action
+    ErrorAction _err = ErrorAction(
+      response: (r) {
+        OccSnackBar.error(context, r.data['code']);
+      },
+      connection: () {
+        OccSnackBar.error(context, "دستگاه به اینترنت متصل نیست!");
+      },
+      cancel: () {
+        OccSnackBar.error(context, "کنسل شد!");
+      },
+    );
 
+    dynamic _result = await Services.addVilla(data, _err);
+
+    // okay
+    if (_result is int && _result > 0) {
+      print(_result);
+      return done(true);
+    } else {
+      done(false);
+    }
+
+    // finish
     setLoading(false);
     setDisabled(false);
-    if (res == false) return done(false);
-    print(res);
-    return done(true);
   }
 
   @override
