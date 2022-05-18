@@ -64,13 +64,6 @@ class RootApp extends StatefulWidget {
 }
 
 class _RootAppState extends State<RootApp> {
-  bool _reload = false;
-  reload() {
-    setState(() {
-      _reload = !_reload;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -90,7 +83,6 @@ class _RootAppState extends State<RootApp> {
       },
       connection: () async {
         if (hasUser) {
-          OccSnackBar.error(context, "دستگاه به اینترنت متصل نیست!");
           showDashboard = true;
         } else {
           showDashboard = false;

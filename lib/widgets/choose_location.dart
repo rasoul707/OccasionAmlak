@@ -25,6 +25,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
   MapController? _mapController;
 
   fullScreen() async {
+    FocusScope.of(context).unfocus();
     final MapData? result = await Navigator.push(
       context,
       MaterialPageRoute(

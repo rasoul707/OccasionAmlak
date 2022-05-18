@@ -37,7 +37,7 @@ class _DashContentState extends State<DashContent> {
     super.initState();
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       // _refreshIndicatorKey.currentState?.show();
-      updateUserData();
+      updateUserData(conError: true);
     });
   }
 
@@ -48,18 +48,22 @@ class _DashContentState extends State<DashContent> {
         type: PageTransitionType.rightToLeft,
         child: const NewFile(),
       ),
-    ).then((_) => updateUserData());
+    ).then((_) => updateUserData(conError: false));
   }
 
   // update user data
-  Future<void> updateUserData() async {
+  Future<void> updateUserData({bool? conError}) async {
     // error action
     ErrorAction _err = ErrorAction(
       response: (r) {
         OccSnackBar.error(context, r.data['code']);
       },
       connection: () {
-        OccSnackBar.error(context, "دستگاه به اینترنت متصل نیست!");
+        if (conError is bool && conError == false) {
+          //
+        } else {
+          OccSnackBar.error(context, "دستگاه به اینترنت متصل نیست!");
+        }
       },
     );
 
