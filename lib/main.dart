@@ -110,9 +110,7 @@ class _RootAppState extends State<RootApp> {
     Navigator.pushReplacement(
       context,
       PageTransition(
-        type: PageTransitionType.scale,
-        duration: const Duration(seconds: 1),
-        alignment: Alignment.center,
+        type: PageTransitionType.rightToLeft,
         child: (showDashboard && hasUser)
             ? const DashContent()
             : const AuthContent(),

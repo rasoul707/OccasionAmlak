@@ -32,9 +32,7 @@ class NewFile extends StatelessWidget {
                     Navigator.push(
                       context,
                       PageTransition(
-                        type: PageTransitionType.scale,
-                        duration: const Duration(seconds: 1),
-                        alignment: Alignment.center,
+                        type: PageTransitionType.rightToLeft,
                         child: AddFile(index),
                       ),
                     )

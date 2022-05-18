@@ -69,10 +69,7 @@ class _AuthContentState extends State<AuthContent> {
       Navigator.pushReplacement(
         context,
         PageTransition(
-            type: PageTransitionType.scale,
-            duration: const Duration(seconds: 1),
-            alignment: Alignment.center,
-            child: const DashContent()),
+            type: PageTransitionType.rightToLeft, child: const DashContent()),
       );
     }
 
