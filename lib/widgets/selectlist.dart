@@ -58,6 +58,7 @@ class _OccSelectListState extends State<OccSelectList> {
     );
 
     void _onTap(String label) {
+      if (widget.enabled is bool && widget.enabled == false) return;
       var _active = widget.controller.active;
       var _activeItems = widget.controller.activeItems;
       if (widget.multiple is bool && widget.multiple!) {

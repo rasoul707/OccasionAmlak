@@ -51,7 +51,10 @@ class OccButton extends StatelessWidget {
     //   );
     // }
 
-    void Function()? _onPress = onPressed;
+    void Function()? _onPress = () {
+      FocusScope.of(context).unfocus();
+      onPressed();
+    };
     Widget child = Text(
       label,
       style: const TextStyle(
@@ -60,7 +63,8 @@ class OccButton extends StatelessWidget {
       ),
     );
     if (loading is bool && loading == true) {
-      _onPress = null;
+      _onPress = FocusScope.of(context).unfocus;
+
       child = const SizedBox(
         child: CircularProgressIndicator(
           color: Colors.white,
@@ -70,7 +74,7 @@ class OccButton extends StatelessWidget {
         width: 25,
       );
     } else if (enabled is bool && enabled == false) {
-      _onPress = null;
+      _onPress = FocusScope.of(context).unfocus;
     }
 
     return ClipRRect(

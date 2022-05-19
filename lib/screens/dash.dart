@@ -173,6 +173,10 @@ class _DashContentState extends State<DashContent> {
                                         image: avatarUrl,
                                         fit: BoxFit.fill,
                                         placeholderFit: BoxFit.fill,
+                                        fadeInDuration:
+                                            const Duration(milliseconds: 300),
+                                        fadeOutDuration:
+                                            const Duration(milliseconds: 300),
                                         imageErrorBuilder: (c, o, s) {
                                           return const Scaffold();
                                         },

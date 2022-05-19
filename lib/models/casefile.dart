@@ -5,10 +5,10 @@ import '../models/hectare.dart';
 import '../models/land.dart';
 import '../models/villa.dart';
 
-part 'file.g.dart';
+part 'casefile.g.dart';
 
 @JsonSerializable()
-class File {
+class CaseFile {
   String? id;
   String? type;
 
@@ -19,8 +19,8 @@ class File {
   List<double>? location;
   int? price;
 
-  List<dynamic>? pictures; //****/
-  dynamic thumb; //****/
+  List<int>? pictures;
+  int? thumb;
 
   Villa? villa;
   Apartment? apartment;
@@ -28,7 +28,7 @@ class File {
   Hectare? hectare;
   Land? land;
 
-  File({
+  CaseFile({
     this.id,
     this.type,
     this.city,
@@ -46,8 +46,9 @@ class File {
     this.land,
   });
 
-  factory File.fromJson(Map<String, dynamic> json) => _$FileFromJson(json);
-  Map<String, dynamic> toJson() => _$FileToJson(this);
+  factory CaseFile.fromJson(Map<String, dynamic> json) =>
+      _$CaseFileFromJson(json);
+  Map<String, dynamic> toJson() => _$CaseFileToJson(this);
 }
 
 

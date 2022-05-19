@@ -1,20 +1,16 @@
-import 'package:occasionapp/models/apartment.dart';
-import 'package:occasionapp/models/commercial.dart';
-import 'package:occasionapp/models/hectare.dart';
-import 'package:retrofit/retrofit.dart';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/user.dart';
-import '../models/file.dart';
-import '../models/land.dart';
+import '../models/casefile.dart';
 import '../models/user.dart';
-import '../models/villa.dart';
-import '../widgets/snackbar.dart';
+
 import 'main.dart';
 
 class Services {
   static dynamic errorHandler(Object obj, err, ty) {
     //
+    print(obj);
     if (obj.runtimeType == DioError) {
       obj = (obj as DioError);
       switch (obj.type) {
@@ -68,10 +64,15 @@ class Services {
           .getMe()
           .catchError((o) => errorHandler(o, e, User()));
 
-  static Future<int> addFile(File m, ErrorAction e) async =>
+  static Future<int> addFile(CaseFile m, ErrorAction e) async =>
       await API(await dioWithToken())
           .addFile(m)
           .catchError((o) => errorHandler(o, e, 0));
+
+  static Future<dynamic> upload(File m, ErrorAction e) async =>
+      await API(await dioWithToken())
+          .upload(m)
+          .catchError((o) => errorHandler(o, e, false));
 
   //
   //

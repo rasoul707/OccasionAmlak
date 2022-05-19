@@ -39,6 +39,7 @@ dependencies:
   flip_card: ^0.6.0
   page_transition: ^2.0.5
   flutter_gravatar: any
+  image_picker: ^0.8.5+3
 
 dev_dependencies:
   flutter_test:

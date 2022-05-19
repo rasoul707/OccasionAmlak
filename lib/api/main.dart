@@ -1,13 +1,9 @@
-import 'package:occasionapp/models/commercial.dart';
-import 'package:occasionapp/models/file.dart';
-import 'package:occasionapp/models/hectare.dart';
-import 'package:occasionapp/models/land.dart';
+import 'dart:io';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
 
+import '../models/casefile.dart';
 import '../models/user.dart';
-import '../models/villa.dart';
-import '../models/apartment.dart';
 
 part 'main.g.dart';
 
@@ -25,5 +21,9 @@ abstract class API {
   Future<User> getMe();
 
   @POST("rapp/v1/addFile")
-  Future<int> addFile(@Body() File data);
+  Future<int> addFile(@Body() CaseFile data);
+
+  @MultiPart()
+  @POST("wp/v2/media/")
+  Future<dynamic> upload(@Part(name: 'file') File image);
 }

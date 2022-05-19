@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:occasionapp/widgets/imgpicker.dart';
 
 import '../helpers/addfile.dart';
-import '../models/file.dart';
+import '../models/casefile.dart';
 import '../api/services.dart';
 import '../data/strings.dart';
 
@@ -78,7 +82,9 @@ class _AddFileState extends State<AddFile> {
   AddHectareController addHectareController = AddHectareController();
   AddLandController addLandController = AddLandController();
 
-  AddFileController _controller = AddFileController();
+  final AddFileController _controller = AddFileController();
+  final PicturePickerController picturePickerController =
+      PicturePickerController();
 
   @override
   void initState() {
@@ -157,11 +163,65 @@ class _AddFileState extends State<AddFile> {
       OccSnackBar.error(context, _e.map((e) => "◀ " + e).toList().join("\n"));
       return;
     }
-    // setLoading(true);
-    // setDisabled(true);
+    setLoading(true);
+    setDisabled(true);
+
+    // *
+    // *
+    // *
+    // *
+    // ************** upload pictures
+    // ******************************
+    List<int> _pictures = [];
+    int? _thumb;
+    List<XFile> pics = picturePickerController.pictures;
+    if (pics.isNotEmpty) {
+      picturePickerController.setUploaded(0);
+      picturePickerController.setUploading(true);
+
+      ErrorAction uploadErrs = ErrorAction(
+        response: (r) {
+          // OccSnackBar.error(context, r.data['code']);
+          print(r.data);
+        },
+        connection: () {
+          // OccSnackBar.error(context, internetConnectionErrorLabel);
+          print('connection');
+        },
+        cancel: () {
+          print('cancel');
+          // OccSnackBar.error(context, canceledFormLabel);
+        },
+      );
+      // upload
+      for (int j = 0; j < pics.length; j++) {
+        File _file = File(pics[j].path);
+        dynamic __result = await Services.upload(_file, uploadErrs);
+        // success
+        if (__result != false) {
+          int? imgID = __result['id'];
+          // print(imgID);
+          if (j == picturePickerController.thumb) {
+            _thumb = imgID;
+          }
+          _pictures.add(imgID!);
+        } else {
+          done(false);
+          return;
+        }
+        picturePickerController.setUploaded(j + 1);
+      }
+      picturePickerController.setUploading(false);
+    }
+    // ************** upload pictures
+    // ******************************
+    // *
+    // *
+    // *
+    // *
 
     // data collect
-    File data = File(
+    CaseFile data = CaseFile(
       price: int.tryParse(priceController.text),
       city: cityController.text,
       district: districtController.text,
@@ -172,8 +232,8 @@ class _AddFileState extends State<AddFile> {
         locationController.center.longitude,
         locationController.zoom,
       ],
-      pictures: [],
-      thumb: 5,
+      pictures: _pictures,
+      thumb: _thumb,
       //
       type: formTypes[widget.index],
     );
@@ -212,7 +272,6 @@ class _AddFileState extends State<AddFile> {
 
     // call api
     int _result = await Services.addFile(data, _err);
-    print(_result);
 
     // okay
     if (_result > 0) {
@@ -220,7 +279,6 @@ class _AddFileState extends State<AddFile> {
     } else {
       done(false);
     }
-
     // finish
     //
   }
@@ -268,6 +326,13 @@ class _AddFileState extends State<AddFile> {
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: ListView(
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: PicturePicker(
+              controller: picturePickerController,
+              enabled: !disabled,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: TextFormField(
@@ -432,7 +497,7 @@ class _AddFileState extends State<AddFile> {
 }
 
 class AddFileController extends AddFileControllerErrorHandler {
-  File data = File();
+  CaseFile data = CaseFile();
 
   @override
   void checkCondition() {
