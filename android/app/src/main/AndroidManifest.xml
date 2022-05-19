@@ -10,7 +10,8 @@
    <application
         android:label="املاک اکازیون"
         android:name="${applicationName}"
-        android:icon="@mipmap/icon">
+        android:icon="@mipmap/rc_icon"
+        >
         <activity
             android:name=".MainActivity"
             android:exported="true"

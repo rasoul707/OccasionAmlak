@@ -30,21 +30,22 @@ class App extends StatelessWidget {
       placeholderWidget: const SplashScreen(loaded: false),
       builder: (ThemeMode themeMode) {
         return MaterialApp(
-            title: appTitle,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeMode,
-            debugShowCheckedModeBanner: false,
-            home: const RootApp(),
-            localizationsDelegates: const [
-              GlobalCupertinoLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale("fa", "IR"), // rtl
-            ],
-            locale: const Locale("fa", "IR"));
+          title: appTitle,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
+          debugShowCheckedModeBanner: false,
+          home: const RootApp(),
+          localizationsDelegates: const [
+            GlobalCupertinoLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale("fa", "IR"), // rtl
+          ],
+          locale: const Locale("fa", "IR"),
+        );
       },
     );
   }
