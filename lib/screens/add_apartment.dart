@@ -1,26 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:occasionapp/models/apartment.dart';
-import '../api/services.dart';
-import '../widgets/occselectlist.dart';
-import '../widgets/occsnackbar.dart';
-import 'file_added_result.dart';
-
-import 'package:flutter_map/flutter_map.dart';
-import 'package:flip_card/flip_card.dart';
-
-import 'package:dio/dio.dart';
-
-import '../api/main.dart';
-import '../helpers/user.dart';
-
-import '../data/colors.dart';
+import '../helpers/addfile.dart';
+import '../models/apartment.dart';
 import '../data/strings.dart';
-import '../widgets/occButton.dart';
-import '../widgets/choose_location.dart';
-import '../models/villa.dart';
+import '../widgets/selectlist.dart';
 
 class AddApartment extends StatefulWidget {
-  const AddApartment({Key? key}) : super(key: key);
+  const AddApartment({
+    Key? key,
+    required this.controller,
+    required this.disabled,
+  }) : super(key: key);
+
+  final AddApartmentController controller;
+  final bool disabled;
 
   @override
   _AddApartmentState createState() => _AddApartmentState();
@@ -28,26 +20,6 @@ class AddApartment extends StatefulWidget {
 
 class _AddApartmentState extends State<AddApartment> {
   //
-  final TextEditingController floorsCountController = TextEditingController();
-  final TextEditingController unitsCountController = TextEditingController();
-  final TextEditingController floorController = TextEditingController();
-  final TextEditingController areaController = TextEditingController();
-  final TextEditingController documentTypeController = TextEditingController();
-  final TextEditingController roomsCountController = TextEditingController();
-  final TextEditingController mastersCountController = TextEditingController();
-  List<String> equipments = [];
-
-  final TextEditingController priceController = TextEditingController();
-
-  final TextEditingController cityController = TextEditingController();
-  final TextEditingController districtController = TextEditingController();
-  final TextEditingController quarterController = TextEditingController();
-  final TextEditingController alleyController = TextEditingController();
-
-  final MapController locationController = MapController();
-
-  final GlobalKey<FlipCardState> buttonFlipKey = GlobalKey<FlipCardState>();
-  final GlobalKey<FlipCardState> formFlipKey = GlobalKey<FlipCardState>();
 
   final FocusNode floorsCountNode = FocusNode();
   final FocusNode unitsCountNode = FocusNode();
@@ -57,669 +29,283 @@ class _AddApartmentState extends State<AddApartment> {
   final FocusNode roomsCountNode = FocusNode();
   final FocusNode mastersCountNode = FocusNode();
 
-  final FocusNode priceNode = FocusNode();
-  final FocusNode cityNode = FocusNode();
-  final FocusNode districtNode = FocusNode();
-  final FocusNode quarterNode = FocusNode();
-  final FocusNode alleyNode = FocusNode();
+  final TextEditingController floorsCountController = TextEditingController();
+  final TextEditingController unitsCountController = TextEditingController();
+  final TextEditingController floorController = TextEditingController();
+  final TextEditingController areaController = TextEditingController();
+  final TextEditingController documentTypeController = TextEditingController();
+  final TextEditingController roomsCountController = TextEditingController();
+  final TextEditingController mastersCountController = TextEditingController();
+  final OccSelectListController equipmentsController =
+      OccSelectListController();
 
-  bool disabled = false;
-  bool loading = false;
-  final int flipSpeed = 1000;
-
-  nextSection() {
-    formFlipKey.currentState!.toggleCard();
-    buttonFlipKey.currentState!.toggleCard();
-    setDisabled(true);
-    Future.delayed(Duration(milliseconds: flipSpeed), () => setDisabled(false));
-  }
-
-  previousSection() {
-    formFlipKey.currentState!.toggleCard();
-    buttonFlipKey.currentState!.toggleCard();
-    setDisabled(true);
-    Future.delayed(Duration(milliseconds: flipSpeed), () => setDisabled(false));
-  }
-
-  setLoading(bool dsb) {
-    setState(() {
-      loading = dsb;
+  @override
+  void initState() {
+    floorsCountController.addListener(() {
+      widget.controller.setFloorsCount(floorsCountController.text);
     });
-  }
-
-  setDisabled(bool dsb) {
-    setState(() {
-      disabled = dsb;
+    unitsCountController.addListener(() {
+      widget.controller.setUnitsCount(unitsCountController.text);
     });
-  }
-
-  done(bool success) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FileAddedResult(success)),
-    );
-  }
-
-  submit() async {
-    setLoading(true);
-    setDisabled(true);
-    Apartment data = Apartment(
-      floorsCount: int.tryParse(floorsCountController.text),
-      unitsCount: int.tryParse(unitsCountController.text),
-      floor: int.tryParse(floorController.text),
-      area: double.tryParse(areaController.text),
-
-      documentType: documentTypeController.text,
-      roomsCount: int.tryParse(roomsCountController.text),
-      mastersCount: int.tryParse(mastersCountController.text),
-
-      equipments: equipments,
-
-      //
-      //
-      price: int.tryParse(priceController.text),
-      city: cityController.text,
-      district: districtController.text,
-      quarter: quarterController.text,
-      alley: alleyController.text,
-      location: [
-        locationController.center.latitude,
-        locationController.center.longitude,
-      ],
-    );
-
-    // error action
-    ErrorAction _err = ErrorAction(
-      response: (r) {
-        OccSnackBar.error(context, r.data['code']);
-      },
-      connection: () {
-        OccSnackBar.error(context, "دستگاه به اینترنت متصل نیست!");
-      },
-      cancel: () {
-        OccSnackBar.error(context, "کنسل شد!");
-      },
-    );
-
-    dynamic _result = await Services.addApartment(data, _err);
-
-    // okay
-    if (_result is int && _result > 0) {
-      print(_result);
-      return done(true);
-    } else {
-      done(false);
-    }
-
-    // finish
-    setLoading(false);
-    setDisabled(false);
+    floorController.addListener(() {
+      widget.controller.setFloor(floorController.text);
+    });
+    areaController.addListener(() {
+      widget.controller.setArea(areaController.text);
+    });
+    documentTypeController.addListener(() {
+      widget.controller.setDocumentType(documentTypeController.text);
+    });
+    roomsCountController.addListener(() {
+      widget.controller.setRoomsCount(roomsCountController.text);
+    });
+    mastersCountController.addListener(() {
+      widget.controller.setMastersCount(mastersCountController.text);
+    });
+    equipmentsController.addListener(() {
+      widget.controller.setEquipments(equipmentsController.activeItems);
+    });
+    widget.controller.checkCondition();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 30, bottom: 15),
-                child: Text(
-                  apartmentFormTitle,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 20,
-                  ),
-                ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 50),
+      child: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: floorsCountNode,
+              controller: floorsCountController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                unitsCountNode.requestFocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: apartmentFormLabels_floorsCount,
               ),
-              Expanded(
-                child: WillPopScope(
-                  onWillPop: () async {
-                    if (!formFlipKey.currentState!.isFront && !disabled) {
-                      previousSection();
-                      return false;
-                    }
-                    if (disabled) return false;
-                    return true;
-                  },
-                  child: FlipCard(
-                    direction: FlipDirection.HORIZONTAL,
-                    flipOnTouch: false,
-                    key: formFlipKey,
-                    speed: flipSpeed,
-                    front: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 50),
-                      child: ListView(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: floorsCountController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                unitsCountNode.requestFocus();
-                              },
-                              focusNode: floorsCountNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_floorsCount,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: unitsCountController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                floorNode.requestFocus();
-                              },
-                              focusNode: unitsCountNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_unitsCount,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: floorController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                areaNode.requestFocus();
-                              },
-                              focusNode: floorNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_floor,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: areaController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                documentTypeNode.requestFocus();
-                              },
-                              focusNode: areaNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_area,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: documentTypeController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                roomsCountNode.requestFocus();
-                              },
-                              focusNode: documentTypeNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_documentType,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: roomsCountController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                mastersCountNode.requestFocus();
-                              },
-                              focusNode: roomsCountNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_roomsCount,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: mastersCountController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.done,
-                              onEditingComplete: () {
-                                mastersCountNode.unfocus();
-                              },
-                              focusNode: mastersCountNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_mastersCount,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: OccSelectList(
-                              items: const [
-                                "انباری",
-                                "پارکینگ",
-                                "آسانسور",
-                                "سونا",
-                                "جکوزی",
-                                "مبله",
-                                "کمد دیواری",
-                                "ویو"
-                              ],
-                              active: equipments,
-                              setActive: (t) {
-                                setState(() {
-                                  equipments = t;
-                                });
-                              },
-                              enabled: !disabled,
-                              multiple: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    back: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 50),
-                      child: ListView(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: priceController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                cityNode.requestFocus();
-                              },
-                              focusNode: priceNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_price,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: cityController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                districtNode.requestFocus();
-                              },
-                              focusNode: cityNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_city,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: districtController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                quarterNode.requestFocus();
-                              },
-                              focusNode: districtNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_district,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: quarterController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                alleyNode.requestFocus();
-                              },
-                              focusNode: quarterNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_quarter,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: alleyController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.done,
-                              onEditingComplete: () {
-                                alleyNode.unfocus();
-                              },
-                              focusNode: alleyNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: apartmentFormLabels_alley,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: ChooseLocation(
-                              controller: locationController,
-                              enabled: !disabled,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 50,
-                  right: 50,
-                  bottom: 30,
-                  top: 15,
-                ),
-                child: FlipCard(
-                  direction: FlipDirection.VERTICAL,
-                  flipOnTouch: false,
-                  key: buttonFlipKey,
-                  speed: flipSpeed,
-                  front: OccButton(
-                    onPressed: () {
-                      nextSection();
-                    },
-                    label: addContinueButtonLabel,
-                    enabled: !disabled,
-                  ),
-                  back: OccButton(
-                    onPressed: () {
-                      submit();
-                    },
-                    label: apartmentFormTitle,
-                    enabled: !disabled,
-                    loading: loading,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: unitsCountNode,
+              controller: unitsCountController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                floorNode.requestFocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: apartmentFormLabels_unitsCount,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: floorNode,
+              controller: floorController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                areaNode.requestFocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: apartmentFormLabels_floor,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: areaNode,
+              controller: areaController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                documentTypeNode.requestFocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: apartmentFormLabels_area,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: documentTypeNode,
+              controller: documentTypeController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                roomsCountNode.requestFocus();
+              },
+              enableSuggestions: true,
+              autocorrect: true,
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                labelText: apartmentFormLabels_documentType,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: roomsCountNode,
+              controller: roomsCountController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                mastersCountNode.requestFocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: apartmentFormLabels_roomsCount,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: mastersCountNode,
+              controller: mastersCountController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.done,
+              onEditingComplete: () {
+                FocusScope.of(context).unfocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: apartmentFormLabels_mastersCount,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: OccSelectList(
+              items: const [
+                "انباری",
+                "پارکینگ",
+                "آسانسور",
+                "سونا",
+                "جکوزی",
+                "مبله",
+                "کمد دیواری",
+                "ویو"
+              ],
+              controller: equipmentsController,
+              enabled: !widget.disabled,
+              multiple: true,
+            ),
+          ),
+        ],
       ),
     );
+  }
+}
+
+class AddApartmentController extends AddFileControllerErrorHandler {
+  Apartment data = Apartment();
+
+  @override
+  void checkCondition() {
+    errorHandler(
+      condition: (isGreaterThan(data.floorsCount, 0)),
+      error: "تعداد طبقات را به درستی وارد کنید",
+    );
+    errorHandler(
+      condition: (isGreaterThan(data.unitsCount, 0)),
+      error: "تعداد واحدها را به درستی وارد کنید",
+    );
+    errorHandler(
+      condition: (isGreaterThan(data.floor, 0)),
+      error: "طبقه را به درستی وارد کنید",
+    );
+
+    errorHandler(
+      condition: (isGreaterThan(data.area, 0)),
+      error: "متراژ را به درستی وارد کنید",
+    );
+    errorHandler(
+      condition: (isRealString(data.documentType)),
+      error: "نوع سند را وارد کنید",
+    );
+    errorHandler(
+      condition: (data.roomsCount is int),
+      error: "تعداد خواب را وارد کنید",
+    );
+    errorHandler(
+      condition: (data.mastersCount is int),
+      error: "تعداد مستر را وارد کنید",
+    );
+
+    notifyListeners();
+  }
+
+  void setFloorsCount(v) {
+    data.floorsCount = int.tryParse(v);
+    checkCondition();
+  }
+
+  void setUnitsCount(v) {
+    data.unitsCount = int.tryParse(v);
+    checkCondition();
+  }
+
+  void setFloor(v) {
+    data.floor = int.tryParse(v);
+    checkCondition();
+  }
+
+  void setArea(v) {
+    data.area = double.tryParse(v);
+    checkCondition();
+  }
+
+  void setDocumentType(v) {
+    data.documentType = v;
+    checkCondition();
+  }
+
+  void setRoomsCount(v) {
+    data.roomsCount = int.tryParse(v);
+    checkCondition();
+  }
+
+  void setMastersCount(v) {
+    data.mastersCount = int.tryParse(v);
+    checkCondition();
+  }
+
+  void setEquipments(v) {
+    data.equipments = v;
+    checkCondition();
   }
 }

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:occasionapp/screens/auth.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:flutter_gravatar/flutter_gravatar.dart';
 
 import '../api/services.dart';
 import '../data/colors.dart';
 import '../data/strings.dart';
 
-import '../widgets/occButton.dart';
-import '../widgets/occCard.dart';
+import '../widgets/button.dart';
+import '../widgets/card.dart';
 
-import '../api/main.dart';
 import '../models/user.dart';
 import '../helpers/user.dart';
 
 import '../screens/new.dart';
-import '../widgets/occsnackbar.dart';
+import '../widgets/snackbar.dart';
 
 class DashContent extends StatefulWidget {
   const DashContent({Key? key}) : super(key: key);
@@ -26,6 +26,7 @@ class DashContent extends StatefulWidget {
 
 class _DashContentState extends State<DashContent> {
   bool _reload = false;
+  bool disabled = false;
   reload() {
     setState(() {
       _reload = !_reload;
@@ -51,6 +52,46 @@ class _DashContentState extends State<DashContent> {
     ).then((_) => updateUserData(conError: false));
   }
 
+  logout() async {
+    final bool? result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(modalLogoutTitle),
+          content: const Text(modalLogoutSubTitle),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text(logoutDialogButtonNo),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text(logoutDialogButtonYes),
+            ),
+          ],
+        );
+      },
+    );
+    if (result is bool && result) {
+      setState(() {
+        disabled = true;
+      });
+      await Future.delayed(const Duration(milliseconds: 900));
+      await removeAuthToken();
+      await removeUserData();
+      Navigator.pushReplacement(
+        context,
+        PageTransition(
+          type: PageTransitionType.leftToRight,
+          child: const AuthContent(),
+        ),
+      );
+    }
+  }
+
   // update user data
   Future<void> updateUserData({bool? conError}) async {
     // error action
@@ -62,7 +103,7 @@ class _DashContentState extends State<DashContent> {
         if (conError is bool && conError == false) {
           //
         } else {
-          OccSnackBar.error(context, "دستگاه به اینترنت متصل نیست!");
+          OccSnackBar.error(context, internetConnectionErrorLabel);
         }
       },
     );
@@ -76,6 +117,7 @@ class _DashContentState extends State<DashContent> {
     }
   }
 
+  static const defaultAvatar = 'assets/images/default_avatar.png';
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<User>(
@@ -83,18 +125,33 @@ class _DashContentState extends State<DashContent> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final User user = snapshot.data!;
+          final _height = MediaQuery.of(context).size.height -
+              MediaQuery.of(context).padding.top -
+              MediaQuery.of(context).padding.bottom;
+
+          final displayName =
+              user.displayName != null ? user.displayName.toString() : "";
+
+          final pendingCount =
+              user.pending != null ? user.pending.toString() : "";
+
+          final confirmedCount =
+              user.confirmed != null ? user.confirmed.toString() : "";
+
+          String avatarUrl = '';
+          if (user.email != null) {
+            final gravatar = Gravatar(user.email!);
+            avatarUrl = gravatar.imageUrl();
+          }
 
           return Scaffold(
-            backgroundColor: bgColor,
             body: SafeArea(
               child: RefreshIndicator(
                 onRefresh: updateUserData,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: SizedBox(
-                    height: MediaQuery.of(context).size.height -
-                        MediaQuery.of(context).padding.top -
-                        MediaQuery.of(context).padding.bottom,
+                    height: _height,
                     child: Center(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -102,33 +159,38 @@ class _DashContentState extends State<DashContent> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Spacer(),
-                            const CircleAvatar(
-                              radius: 55,
-                              backgroundColor: hintColor,
-                              child: Padding(
-                                padding: EdgeInsets.all(8), // Border radius
-                                child: ClipOval(
-                                  child: Image(
-                                    image: AssetImage(
-                                      "assets/images/default_avatar.png",
+                            ClipOval(
+                              child: Container(
+                                child: AspectRatio(
+                                  aspectRatio: 1 / 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(
+                                      8,
+                                    ), // Border radius
+                                    child: ClipOval(
+                                      child: FadeInImage.assetNetwork(
+                                        placeholder: defaultAvatar,
+                                        image: avatarUrl,
+                                        fit: BoxFit.fill,
+                                        placeholderFit: BoxFit.fill,
+                                        imageErrorBuilder: (c, o, s) {
+                                          return const Scaffold();
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
+                                width: 100,
+                                height: 100,
+                                color: hintColor,
                               ),
                             ),
                             Padding(
                               padding:
                                   const EdgeInsets.only(top: 10, bottom: 20),
                               child: Text(
-                                user.displayName != null
-                                    ? user.displayName.toString()
-                                    : "",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 22,
-                                  color: textColor,
-                                ),
-                                textAlign: TextAlign.center,
+                                displayName,
+                                style: Theme.of(context).textTheme.titleLarge,
                               ),
                             ),
                             Row(
@@ -138,17 +200,13 @@ class _DashContentState extends State<DashContent> {
                                 Expanded(
                                   child: OccCard(
                                     head: pendingFilesLabel,
-                                    sub: user.pending != null
-                                        ? user.pending.toString()
-                                        : "",
+                                    sub: pendingCount,
                                   ),
                                 ),
                                 Expanded(
                                   child: OccCard(
                                     head: confirmedFilesLabel,
-                                    sub: user.confirmed != null
-                                        ? user.confirmed.toString()
-                                        : "",
+                                    sub: confirmedCount,
                                   ),
                                 ),
                               ],
@@ -158,9 +216,19 @@ class _DashContentState extends State<DashContent> {
                               child: OccButton(
                                 onPressed: addNewFile,
                                 label: newFileButton,
+                                enabled: !disabled,
                               ),
                             ),
                             const Spacer(),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 30),
+                              child: OccButton(
+                                onPressed: logout,
+                                label: logoutButton,
+                                type: 'cancel',
+                                enabled: !disabled,
+                              ),
+                            ),
                           ],
                         ),
                       ),

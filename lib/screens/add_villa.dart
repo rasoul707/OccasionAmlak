@@ -1,32 +1,36 @@
 import 'package:flutter/material.dart';
-import '../api/services.dart';
-import '../widgets/occselectlist.dart';
-import '../widgets/occsnackbar.dart';
-import 'file_added_result.dart';
-
-import 'package:flutter_map/flutter_map.dart';
-import 'package:flip_card/flip_card.dart';
-
-import 'package:dio/dio.dart';
-
-import '../api/main.dart';
-import '../helpers/user.dart';
-
-import '../data/colors.dart';
-import '../data/strings.dart';
-import '../widgets/occButton.dart';
-import '../widgets/choose_location.dart';
+import '../helpers/addfile.dart';
 import '../models/villa.dart';
+import '../data/strings.dart';
+import '../widgets/selectlist.dart';
+
+const typesItems = ["فلت", "دوبلکس", "تریبلکس", "طبقات جداگانه"];
 
 class AddVilla extends StatefulWidget {
-  const AddVilla({Key? key}) : super(key: key);
+  const AddVilla({
+    Key? key,
+    required this.controller,
+    required this.disabled,
+  }) : super(key: key);
+
+  final AddVillaController controller;
+  final bool disabled;
 
   @override
   _AddVillaState createState() => _AddVillaState();
 }
 
 class _AddVillaState extends State<AddVilla> {
-  final TextEditingController typeController = TextEditingController();
+  //
+
+  final FocusNode landAreaNode = FocusNode();
+  final FocusNode buildingAreaNode = FocusNode();
+  final FocusNode constructionYearNode = FocusNode();
+  final FocusNode documentTypeNode = FocusNode();
+  final FocusNode roomsCountNode = FocusNode();
+  final FocusNode mastersCountNode = FocusNode();
+
+  final OccSelectListController typeController = OccSelectListController();
   final TextEditingController landAreaController = TextEditingController();
   final TextEditingController buildingAreaController = TextEditingController();
   final TextEditingController constructionYearController =
@@ -35,683 +39,235 @@ class _AddVillaState extends State<AddVilla> {
   final TextEditingController roomsCountController = TextEditingController();
   final TextEditingController mastersCountController = TextEditingController();
 
-  final TextEditingController priceController = TextEditingController();
-
-  final TextEditingController cityController = TextEditingController();
-  final TextEditingController districtController = TextEditingController();
-  final TextEditingController quarterController = TextEditingController();
-  final TextEditingController alleyController = TextEditingController();
-
-  final MapController locationController = MapController();
-
-  final GlobalKey<FlipCardState> buttonFlipKey = GlobalKey<FlipCardState>();
-  final GlobalKey<FlipCardState> formFlipKey = GlobalKey<FlipCardState>();
-
-  bool disabled = false;
-  bool loading = false;
-  final int flipSpeed = 1000;
-
-  final FocusNode typeNode = FocusNode();
-  final FocusNode landAreaNode = FocusNode();
-  final FocusNode buildingAreaNode = FocusNode();
-  final FocusNode constructionYearNode = FocusNode();
-  final FocusNode documentTypeNode = FocusNode();
-  final FocusNode roomsCountNode = FocusNode();
-  final FocusNode mastersCountNode = FocusNode();
-
-  final FocusNode priceNode = FocusNode();
-  final FocusNode cityNode = FocusNode();
-  final FocusNode districtNode = FocusNode();
-  final FocusNode quarterNode = FocusNode();
-  final FocusNode alleyNode = FocusNode();
-
-  String type = "";
-
-  nextSection() {
-    formFlipKey.currentState!.toggleCard();
-    buttonFlipKey.currentState!.toggleCard();
-    setDisabled(true);
-    Future.delayed(Duration(milliseconds: flipSpeed), () => setDisabled(false));
-  }
-
-  previousSection() {
-    formFlipKey.currentState!.toggleCard();
-    buttonFlipKey.currentState!.toggleCard();
-    setDisabled(true);
-    Future.delayed(Duration(milliseconds: flipSpeed), () => setDisabled(false));
-  }
-
-  setLoading(bool dsb) {
-    setState(() {
-      loading = dsb;
+  @override
+  void initState() {
+    typeController.addListener(() {
+      widget.controller.setType(typeController.active);
     });
-  }
-
-  setDisabled(bool dsb) {
-    setState(() {
-      disabled = dsb;
+    landAreaController.addListener(() {
+      widget.controller.setLandArea(landAreaController.text);
     });
-  }
-
-  done(bool success) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FileAddedResult(success)),
-    );
-  }
-
-  submit() async {
-    setLoading(true);
-    setDisabled(true);
-    Villa data = Villa(
-      type: type,
-      landArea: double.tryParse(landAreaController.text),
-      buildingArea: double.tryParse(buildingAreaController.text),
-      constructionYear: int.tryParse(constructionYearController.text),
-      documentType: documentTypeController.text,
-      roomsCount: int.tryParse(roomsCountController.text),
-      mastersCount: int.tryParse(mastersCountController.text),
-      //
-      //
-      price: int.tryParse(priceController.text),
-      city: cityController.text,
-      district: districtController.text,
-      quarter: quarterController.text,
-      alley: alleyController.text,
-      location: [
-        locationController.center.latitude,
-        locationController.center.longitude,
-      ],
-    );
-
-    // error action
-    ErrorAction _err = ErrorAction(
-      response: (r) {
-        OccSnackBar.error(context, r.data['code']);
-      },
-      connection: () {
-        OccSnackBar.error(context, "دستگاه به اینترنت متصل نیست!");
-      },
-      cancel: () {
-        OccSnackBar.error(context, "کنسل شد!");
-      },
-    );
-
-    dynamic _result = await Services.addVilla(data, _err);
-
-    // okay
-    if (_result is int && _result > 0) {
-      print(_result);
-      return done(true);
-    } else {
-      done(false);
-    }
-
-    // finish
-    setLoading(false);
-    setDisabled(false);
+    buildingAreaController.addListener(() {
+      widget.controller.setBuildingArea(buildingAreaController.text);
+    });
+    constructionYearController.addListener(() {
+      widget.controller.setConstructionYear(constructionYearController.text);
+    });
+    documentTypeController.addListener(() {
+      widget.controller.setDocumentType(documentTypeController.text);
+    });
+    roomsCountController.addListener(() {
+      widget.controller.setRoomsCount(roomsCountController.text);
+    });
+    mastersCountController.addListener(() {
+      widget.controller.setMastersCount(mastersCountController.text);
+    });
+    widget.controller.checkCondition();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 30, bottom: 15),
-                child: Text(
-                  villaFormTitle,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 20,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: WillPopScope(
-                  onWillPop: () async {
-                    if (!formFlipKey.currentState!.isFront && !disabled) {
-                      previousSection();
-                      return false;
-                    }
-                    if (disabled) return false;
-                    return true;
-                  },
-                  child: FlipCard(
-                    direction: FlipDirection.HORIZONTAL,
-                    flipOnTouch: false,
-                    key: formFlipKey,
-                    speed: flipSpeed,
-                    front: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 50),
-                      child: ListView(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: OccSelectList(
-                              items: const [
-                                "فلت",
-                                "دوبلکس",
-                                "تریبلکس",
-                                "طبقات جداگانه"
-                              ],
-                              active: type,
-                              setActive: (t) {
-                                setState(() {
-                                  type = t;
-                                });
-                              },
-                              enabled: !disabled,
-                            ),
-                          ),
-                          // Padding(
-                          //   padding: const EdgeInsets.symmetric(vertical: 10),
-                          //   child: TextFormField(
-                          //     controller: typeController,
-                          //     enabled: !disabled,
-                          //     textInputAction: TextInputAction.next,
-                          //     onEditingComplete: () {
-                          //       landAreaNode.requestFocus();
-                          //     },
-                          //     focusNode: typeNode,
-                          //     // textAlign: TextAlign.left,
-                          //     // textDirection: TextDirection.ltr,
-                          //     enableSuggestions: true,
-                          //     autocorrect: true,
-                          //     keyboardType: TextInputType.text,
-                          //     decoration: const InputDecoration(
-                          //       labelText: villaFormLabels_type,
-                          //       floatingLabelBehavior:
-                          //           FloatingLabelBehavior.always,
-                          //       filled: true,
-                          //       border: OutlineInputBorder(
-                          //         borderSide: BorderSide.none,
-                          //         borderRadius: BorderRadius.all(
-                          //           Radius.circular(50),
-                          //         ),
-                          //       ),
-                          //       fillColor: textFieldBgColor,
-                          //       focusColor: textColor,
-                          //       labelStyle: TextStyle(
-                          //         color: textColor,
-                          //       ),
-                          //       contentPadding:
-                          //           EdgeInsets.symmetric(horizontal: 25),
-                          //     ),
-                          //     style: const TextStyle(color: textColor),
-                          //   ),
-                          // ),
-
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: landAreaController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                buildingAreaNode.requestFocus();
-                              },
-                              focusNode: landAreaNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_landArea,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: buildingAreaController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                constructionYearNode.requestFocus();
-                              },
-                              focusNode: buildingAreaNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_buildingArea,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: constructionYearController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                documentTypeNode.requestFocus();
-                              },
-                              focusNode: constructionYearNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_constructionYear,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: documentTypeController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                roomsCountNode.requestFocus();
-                              },
-                              focusNode: documentTypeNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_documentType,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: roomsCountController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                mastersCountNode.requestFocus();
-                              },
-                              focusNode: roomsCountNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_roomsCount,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: mastersCountController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.done,
-                              onEditingComplete: () {
-                                nextSection();
-                              },
-                              focusNode: mastersCountNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_mastersCount,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    back: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 50),
-                      child: ListView(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: priceController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                cityNode.requestFocus();
-                              },
-                              focusNode: priceNode,
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_price,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: cityController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                districtNode.requestFocus();
-                              },
-                              focusNode: cityNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_city,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: districtController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                quarterNode.requestFocus();
-                              },
-                              focusNode: districtNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_district,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: quarterController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () {
-                                alleyNode.requestFocus();
-                              },
-                              focusNode: quarterNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_quarter,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextFormField(
-                              controller: alleyController,
-                              enabled: !disabled,
-                              textInputAction: TextInputAction.done,
-                              onEditingComplete: () {
-                                alleyNode.unfocus();
-                              },
-                              focusNode: alleyNode,
-                              // textAlign: TextAlign.left,
-                              // textDirection: TextDirection.ltr,
-                              enableSuggestions: true,
-                              autocorrect: true,
-                              keyboardType: TextInputType.text,
-
-                              decoration: const InputDecoration(
-                                labelText: villaFormLabels_alley,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(50),
-                                  ),
-                                ),
-                                fillColor: textFieldBgColor,
-                                focusColor: textColor,
-                                labelStyle: TextStyle(
-                                  color: textColor,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                              ),
-                              style: const TextStyle(color: textColor),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: ChooseLocation(
-                              controller: locationController,
-                              enabled: !disabled,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 50,
-                  right: 50,
-                  bottom: 30,
-                  top: 15,
-                ),
-                child: FlipCard(
-                  direction: FlipDirection.VERTICAL,
-                  flipOnTouch: false,
-                  key: buttonFlipKey,
-                  speed: flipSpeed,
-                  front: OccButton(
-                    onPressed: () {
-                      nextSection();
-                    },
-                    label: addContinueButtonLabel,
-                    enabled: !disabled,
-                  ),
-                  back: OccButton(
-                    onPressed: () {
-                      submit();
-                    },
-                    label: villaFormTitle,
-                    enabled: !disabled,
-                    loading: loading,
-                  ),
-                ),
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 50),
+      child: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: OccSelectList(
+              items: typesItems,
+              controller: typeController,
+              enabled: !widget.disabled,
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: landAreaNode,
+              controller: landAreaController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                buildingAreaNode.requestFocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: villaFormLabels_landArea,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: buildingAreaNode,
+              controller: buildingAreaController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                constructionYearNode.requestFocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: villaFormLabels_buildingArea,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: constructionYearNode,
+              controller: constructionYearController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                documentTypeNode.requestFocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: villaFormLabels_constructionYear,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: documentTypeNode,
+              controller: documentTypeController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                roomsCountNode.requestFocus();
+              },
+              enableSuggestions: true,
+              autocorrect: true,
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                labelText: villaFormLabels_documentType,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: roomsCountNode,
+              controller: roomsCountController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                mastersCountNode.requestFocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: villaFormLabels_roomsCount,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: mastersCountNode,
+              controller: mastersCountController,
+              enabled: !widget.disabled,
+              textInputAction: TextInputAction.done,
+              onEditingComplete: () {
+                FocusScope.of(context).unfocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: villaFormLabels_mastersCount,
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+}
+
+class AddVillaController extends AddFileControllerErrorHandler {
+  Villa data = Villa();
+
+  @override
+  void checkCondition() {
+    errorHandler(
+      condition: (isOneOf(data.type, typesItems)),
+      error: "نوع ویلا را انتخاب کنید",
+    );
+    errorHandler(
+      condition: (isGreaterThan(data.landArea, 0)),
+      error: "متراژ زمین را به درستی وارد کنید",
+    );
+    errorHandler(
+      condition: (isGreaterThan(data.buildingArea, 0)),
+      error: "متراژ بنا را به درستی وارد کنید",
+    );
+    errorHandler(
+      condition: (isGreaterThan(data.constructionYear, 0)),
+      error: "سال ساخت را به درستی وارد کنید",
+    );
+    errorHandler(
+      condition: (isRealString(data.documentType)),
+      error: "نوع سند را وارد کنید",
+    );
+    errorHandler(
+      condition: (data.roomsCount is int),
+      error: "تعداد خواب را وارد کنید",
+    );
+    errorHandler(
+      condition: (data.mastersCount is int),
+      error: "تعداد مستر را وارد کنید",
+    );
+
+    notifyListeners();
+  }
+
+  void setType(v) {
+    data.type = v;
+    checkCondition();
+  }
+
+  void setLandArea(v) {
+    data.landArea = double.tryParse(v);
+    checkCondition();
+  }
+
+  void setBuildingArea(v) {
+    data.buildingArea = double.tryParse(v);
+    checkCondition();
+  }
+
+  void setConstructionYear(v) {
+    data.constructionYear = int.tryParse(v);
+    checkCondition();
+  }
+
+  void setDocumentType(v) {
+    data.documentType = v;
+    checkCondition();
+  }
+
+  void setRoomsCount(v) {
+    data.roomsCount = int.tryParse(v);
+    checkCondition();
+  }
+
+  void setMastersCount(v) {
+    data.mastersCount = int.tryParse(v);
+    checkCondition();
   }
 }

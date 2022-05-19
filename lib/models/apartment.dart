@@ -4,36 +4,16 @@ part 'apartment.g.dart';
 
 @JsonSerializable()
 class Apartment {
-  String? id;
-
   int? floorsCount;
   int? unitsCount;
-
   int? floor;
-
   double? area;
-
   int? roomsCount;
   int? mastersCount;
-
   String? documentType;
-
   List<String>? equipments;
 
-  // ####
-
-  String? city;
-  String? district;
-
-  String? quarter;
-  String? alley;
-  List<double>? location;
-  int? price;
-
-  // ####
-
   Apartment({
-    this.id,
     this.floorsCount,
     this.unitsCount,
     this.floor,
@@ -42,13 +22,6 @@ class Apartment {
     this.mastersCount,
     this.documentType,
     this.equipments,
-    //
-    this.city,
-    this.district,
-    this.quarter,
-    this.alley,
-    this.location,
-    this.price,
   });
 
   factory Apartment.fromJson(Map<String, dynamic> json) =>

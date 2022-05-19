@@ -5,10 +5,11 @@ import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/user.dart';
+import '../models/file.dart';
 import '../models/land.dart';
 import '../models/user.dart';
 import '../models/villa.dart';
-import '../widgets/occsnackbar.dart';
+import '../widgets/snackbar.dart';
 import 'main.dart';
 
 class Services {
@@ -67,29 +68,9 @@ class Services {
           .getMe()
           .catchError((o) => errorHandler(o, e, User()));
 
-  static Future<dynamic> addVilla(Villa m, ErrorAction e) async =>
+  static Future<int> addFile(File m, ErrorAction e) async =>
       await API(await dioWithToken())
-          .addVilla(m)
-          .catchError((o) => errorHandler(o, e, 0));
-
-  static Future<dynamic> addApartment(Apartment m, ErrorAction e) async =>
-      await API(await dioWithToken())
-          .addApartment(m)
-          .catchError((o) => errorHandler(o, e, 0));
-
-  static Future<dynamic> addCommercial(Commercial m, ErrorAction e) async =>
-      await API(await dioWithToken())
-          .addCommercial(m)
-          .catchError((o) => errorHandler(o, e, 0));
-
-  static Future<dynamic> addLand(Land m, ErrorAction e) async =>
-      await API(await dioWithToken())
-          .addLand(m)
-          .catchError((o) => errorHandler(o, e, 0));
-
-  static Future<dynamic> addHectare(Hectare m, ErrorAction e) async =>
-      await API(await dioWithToken())
-          .addHectare(m)
+          .addFile(m)
           .catchError((o) => errorHandler(o, e, 0));
 
   //

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../data/colors.dart';
 import '../data/strings.dart';
-import '../widgets/occButton.dart';
+import 'button.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as latLng;
 import 'package:geolocator/geolocator.dart';

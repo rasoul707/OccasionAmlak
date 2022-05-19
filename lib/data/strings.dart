@@ -14,6 +14,12 @@ const loginButtonLabel = "ورود به سامانه";
 const confirmedFilesLabel = "فایل های تایید شده";
 const pendingFilesLabel = "در انتظار تایید";
 const newFileButton = "ثبت فایل جدید";
+const logoutButton = "خروج از حساب کاربری";
+const modalLogoutTitle = "خروج از حساب کاربری";
+const modalLogoutSubTitle = "آیا اطمینان دارید؟";
+const logoutDialogButtonYes = "بله";
+const logoutDialogButtonNo = "انصراف";
+const logoutSuccessText = "با موفقیت خارج شدید";
 
 // new
 const fileTypes = [
@@ -33,6 +39,7 @@ const fileAddedErrorSubTitle = "لطفا مجددا تلاش کنید";
 const back2HomeButtonLabel = "بازگشت به خانه";
 
 const loginSuccessText = "ورود موفقیت آمیز بود...";
+const internetConnectionErrorLabel = "دستگاه به اینترنت متصل نیست!";
 
 //
 //
@@ -51,6 +58,20 @@ const currentLocationLabel = "موقعیت فعلی من";
 //
 //
 
+const addFileFormLabels_city = "شهر";
+const addFileFormLabels_district = "منطقه";
+const addFileFormLabels_quarter = "محله";
+const addFileFormLabels_alley = "کوچه";
+const addFileFormLabels_price = "قیمت";
+
+//
+//
+
+const canceledFormLabel = "کنسل شد";
+
+//
+//
+
 const villaFormLabels_type = "نوع ویلا";
 const villaFormLabels_landArea = "متراژ زمین";
 const villaFormLabels_buildingArea = "متراژ بنا";
@@ -58,12 +79,6 @@ const villaFormLabels_constructionYear = "سال ساخت";
 const villaFormLabels_documentType = "نوع سند";
 const villaFormLabels_roomsCount = "تعداد اتاق";
 const villaFormLabels_mastersCount = "تعداد مستر";
-
-const villaFormLabels_city = "شهر";
-const villaFormLabels_district = "منطقه";
-const villaFormLabels_quarter = "محله";
-const villaFormLabels_alley = "کوچه";
-const villaFormLabels_price = "قیمت";
 
 //
 //
@@ -76,12 +91,6 @@ const apartmentFormLabels_roomsCount = "تعداد خواب";
 const apartmentFormLabels_mastersCount = "تعداد مستر";
 const apartmentFormLabels_documentType = "نوع سند";
 
-const apartmentFormLabels_city = "شهر";
-const apartmentFormLabels_district = "منطقه";
-const apartmentFormLabels_quarter = "محله";
-const apartmentFormLabels_alley = "کوچه";
-const apartmentFormLabels_price = "قیمت";
-
 //
 //
 
@@ -89,12 +98,6 @@ const landFormLabels_usageStatus = "وضعیت کاربری";
 const landFormLabels_tissueStatus = "وضعیت بافت";
 const landFormLabels_area = "متراژ";
 const landFormLabels_documentType = "نوع سند";
-
-const landFormLabels_city = "شهر";
-const landFormLabels_district = "منطقه";
-const landFormLabels_quarter = "محله";
-const landFormLabels_alley = "کوچه";
-const landFormLabels_price = "قیمت";
 
 //
 //
@@ -105,12 +108,6 @@ const commercialFormLabels_documentType = "نوع سند";
 const commercialFormLabels_floor = "طبقه ملک";
 const commercialFormLabels_commercialArea = "متراژ بر تجاری";
 
-const commercialFormLabels_city = "شهر";
-const commercialFormLabels_district = "منطقه";
-const commercialFormLabels_quarter = "محله";
-const commercialFormLabels_alley = "کوچه";
-const commercialFormLabels_price = "قیمت";
-
 //
 //
 
@@ -118,9 +115,3 @@ const hectareFormLabels_usageStatus = "وضعیت کاربری";
 const hectareFormLabels_tissueStatus = "وضعیت بافت";
 const hectareFormLabels_area = "متراژ";
 const hectareFormLabels_documentType = "نوع سند";
-
-const hectareFormLabels_city = "شهر";
-const hectareFormLabels_district = "منطقه";
-const hectareFormLabels_quarter = "محله";
-const hectareFormLabels_alley = "کوچه";
-const hectareFormLabels_price = "قیمت";

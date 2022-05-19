@@ -30,42 +30,32 @@ class SplashScreen extends StatelessWidget {
               children: [
                 const SizedBox(),
                 Column(
-                  children: const [
-                    Image(
-                      image: AssetImage("assets/images/logo_black.png"),
-                      width: 270,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 20),
+                      child: Image(
+                        image: AssetImage("assets/images/logo_black.png"),
+                        width: 270,
+                      ),
                     ),
-                    Padding(padding: EdgeInsets.only(bottom: 20)),
                     Text(
                       appTitle,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 30,
-                        color: textColor,
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium,
                       textAlign: TextAlign.center,
                     ),
                     Text(
                       appDesc,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                        color: textColor,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium,
                       textAlign: TextAlign.center,
                     ),
                   ],
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 50.0,
                   width: double.infinity,
                   child: Text(
                     appVer,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: textColor,
-                    ),
+                    style: Theme.of(context).textTheme.labelLarge,
                     textAlign: TextAlign.center,
                   ),
                 ),

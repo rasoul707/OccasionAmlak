@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../data/colors.dart';
 import '../data/strings.dart';
-import '../widgets/occButton.dart';
+import '../widgets/button.dart';
 
 class FileAddedResult extends StatelessWidget {
   const FileAddedResult(

@@ -5,7 +5,7 @@ import 'add_file.dart';
 import '../data/colors.dart';
 import '../data/strings.dart';
 
-import '../widgets/occCard.dart';
+import '../widgets/card.dart';
 
 class NewFile extends StatelessWidget {
   const NewFile({Key? key}) : super(key: key);

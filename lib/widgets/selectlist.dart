@@ -1,21 +1,37 @@
 import 'package:flutter/material.dart';
 import '../data/colors.dart';
 
-class OccSelectList extends StatelessWidget {
+class OccSelectList extends StatefulWidget {
   const OccSelectList({
     Key? key,
     required this.items,
-    required this.active,
-    required this.setActive,
+    required this.controller,
     this.enabled,
     this.multiple,
   }) : super(key: key);
 
   final List<String> items;
-  final dynamic active;
-  final void Function(dynamic) setActive;
+  final OccSelectListController controller;
   final bool? enabled;
   final bool? multiple;
+
+  @override
+  _OccSelectListState createState() => _OccSelectListState();
+}
+
+class _OccSelectListState extends State<OccSelectList> {
+  List<String> activeItems = [];
+
+  @override
+  void initState() {
+    widget.controller.addListener(() {
+      setState(() {
+        activeItems = widget.controller.activeItems;
+      });
+    });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,18 +58,20 @@ class OccSelectList extends StatelessWidget {
     );
 
     void _onTap(String label) {
-      if (multiple is bool && multiple!) {
-        if (active.contains(label)) {
-          active.remove(label);
+      var _active = widget.controller.active;
+      var _activeItems = widget.controller.activeItems;
+      if (widget.multiple is bool && widget.multiple!) {
+        if (_activeItems.contains(label)) {
+          _activeItems.remove(label);
         } else {
-          active.add(label);
+          _activeItems.add(label);
         }
-        setActive(active);
+        widget.controller.setValue(_activeItems);
       } else {
-        if (active == label) {
-          setActive("");
+        if (_active == label) {
+          widget.controller.setValue('');
         } else {
-          setActive(label);
+          widget.controller.setValue(label);
         }
       }
     }
@@ -71,7 +89,6 @@ class OccSelectList extends StatelessWidget {
               ),
             ),
           ),
-          // color: textFieldBgColor,
           decoration: isActive ? activeDecor : normalDecor,
         ),
         onTap: () => _onTap(label),
@@ -82,11 +99,27 @@ class OccSelectList extends StatelessWidget {
       height: 50,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        physics: (enabled is bool && enabled == false)
+        physics: (widget.enabled is bool && widget.enabled == false)
             ? const NeverScrollableScrollPhysics()
             : null,
-        children: items.map((e) => item(e, active.contains(e))).toList(),
+        children:
+            widget.items.map((e) => item(e, activeItems.contains(e))).toList(),
       ),
     );
+  }
+}
+
+class OccSelectListController extends ChangeNotifier {
+  List<String> activeItems = [];
+  String active = '';
+
+  void setValue(v) {
+    if (v is List<String>) {
+      activeItems = v;
+    } else {
+      active = v;
+      activeItems = [v];
+    }
+    notifyListeners();
   }
 }

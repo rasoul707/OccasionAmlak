@@ -20,19 +20,12 @@ class OccCard extends StatelessWidget {
       content = [
         Text(
           head,
-          style: const TextStyle(
-            color: textColor,
-            fontSize: 12,
-          ),
+          style: Theme.of(context).textTheme.labelMedium,
           textAlign: TextAlign.center,
         ),
         Text(
           sub!,
-          style: const TextStyle(
-            color: textColor,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+          style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         )
       ];
@@ -40,11 +33,7 @@ class OccCard extends StatelessWidget {
       content = [
         Text(
           head,
-          style: const TextStyle(
-            color: textColor,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+          style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         )
       ];
@@ -53,16 +42,11 @@ class OccCard extends StatelessWidget {
     return SizedBox(
       height: 85,
       child: Card(
-        // margin: EdgeInsets.zero,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: content,
-        ),
-        color: textFieldBgColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
         ),
       ),
     );

@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:occasionapp/data/colors.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:theme_mode_handler/theme_mode_handler.dart';
 
 import 'api/services.dart';
 import 'data/strings.dart';
 
-import 'helpers/user.dart';
 import 'screens/splash.dart';
 import 'screens/auth.dart';
 import 'screens/dash.dart';
 
-import 'widgets/occsnackbar.dart';
-import 'widgets/theme.dart';
+import 'helpers/theme.dart';
+
+import 'helpers/user.dart';
 
 void main() {
   debugPaintSizeEnabled = false;
-
   runApp(const App());
 }
 
@@ -44,7 +42,7 @@ class App extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
             ],
             supportedLocales: const [
-              Locale("fa", "IR"), // OR Locale('ar', 'AE') OR Other RTL locales
+              Locale("fa", "IR"), // rtl
             ],
             locale: const Locale("fa", "IR"));
       },
@@ -76,7 +74,6 @@ class _RootAppState extends State<RootApp> {
     bool hasUser = await hasUserData();
 
     // error action
-
     ErrorAction _err = ErrorAction(
       response: (r) {
         showDashboard = false;
