@@ -26,6 +26,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
 
   fullScreen() async {
     FocusScope.of(context).unfocus();
+    if (widget.enabled is bool && widget.enabled == false) return;
     final MapData? result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -57,6 +58,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
                               label: currentLocationLabel,
                               type: 'cancel',
                               onPressed: () {
+                                print('my loc');
                                 locateUser(mc);
                               },
                             ),
@@ -69,6 +71,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
                             child: OccButton(
                               label: setMapPointLabel,
                               onPressed: () {
+                                print('set');
                                 Navigator.pop(
                                   context,
                                   MapData(
@@ -155,23 +158,20 @@ class _ChooseLocationState extends State<ChooseLocation> {
 
   @override
   Widget build(BuildContext context) {
-    //
-    dynamic map = _MapContent(
-      controller: _mapController,
-      fullScreen: fullScreen,
-      center: latLng.LatLng(35.6973918, 51.3476617),
-    );
-    // if (widget.enabled is bool && widget.enabled == false) {
-    //   map = AbsorbPointer(child: map);
-    // }
-
     return SizedBox(
       height: 200,
       child: ClipRRect(
         borderRadius: const BorderRadius.all(
           Radius.circular(30),
         ),
-        child: map,
+        child: IgnorePointer(
+          ignoring: !widget.enabled!,
+          child: _MapContent(
+            controller: _mapController,
+            fullScreen: fullScreen,
+            center: latLng.LatLng(35.6973918, 51.3476617),
+          ),
+        ),
       ),
     );
     // return ;

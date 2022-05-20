@@ -43,7 +43,7 @@ class _PicturePickerState extends State<PicturePicker> {
 
   onTap() async {
     FocusScope.of(context).unfocus();
-    if (widget.enabled is bool && widget.enabled == false) return;
+    // if (widget.enabled is bool && widget.enabled == false) return;
     const shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(30.0),
@@ -322,6 +322,13 @@ class _PicturePanelState extends State<PicturePanel> {
       },
     );
 
+    var title = "تصاویر";
+
+// 'تصاویر ' +
+//                     (picturesState.isNotEmpty
+//                         ? '(' + picturesState.length.toString() + ')'
+//                         : '')
+
     return Container(
       color: Colors.transparent,
       child: Padding(
@@ -330,12 +337,9 @@ class _PicturePanelState extends State<PicturePanel> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Padding(
-              padding: EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 10),
               child: Text(
-                'تصاویر' +
-                    (picturesState.isNotEmpty
-                        ? '(' + picturesState.length.toString() + ')'
-                        : ''),
+                title,
                 style: Theme.of(context).textTheme.titleMedium!,
                 textAlign: TextAlign.center,
               ),
