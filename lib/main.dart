@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:theme_mode_handler/theme_mode_handler.dart';
+import 'package:flutter_flipperkit/flutter_flipperkit.dart';
 
 import 'api/services.dart';
 import 'data/strings.dart';
@@ -17,6 +18,14 @@ import 'helpers/user.dart';
 
 void main() {
   debugPaintSizeEnabled = false;
+  WidgetsFlutterBinding.ensureInitialized();
+
+  FlipperClient flipperClient = FlipperClient.getDefault();
+  flipperClient.addPlugin(FlipperNetworkPlugin());
+  flipperClient.addPlugin(FlipperSharedPreferencesPlugin());
+  // flipperClient.addPlugin(new FlipperDatabaseBrowserPlugin());
+  // flipperClient.addPlugin(new FlipperReduxInspectorPlugin());
+  flipperClient.start();
   runApp(const App());
 }
 
