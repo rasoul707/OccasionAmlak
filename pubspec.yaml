@@ -40,8 +40,6 @@ dependencies:
   page_transition: ^2.0.5
   flutter_gravatar: any
   image_picker: ^0.8.5+3
-  share: ^2.0.4
-  flutter_flipperkit: ^0.0.28
 
 dev_dependencies:
   flutter_test:
