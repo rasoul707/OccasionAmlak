@@ -86,6 +86,8 @@ class _AddFileState extends State<AddFile> {
   final PicturePickerController picturePickerController =
       PicturePickerController();
 
+  final ScrollController generalDataScrollController = ScrollController();
+
   @override
   void initState() {
     priceController.addListener(() {
@@ -166,6 +168,12 @@ class _AddFileState extends State<AddFile> {
     setLoading(true);
     setDisabled(true);
 
+    generalDataScrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.ease,
+    );
+
     // *
     // *
     // *
@@ -176,25 +184,25 @@ class _AddFileState extends State<AddFile> {
     int? _thumb;
     List<XFile> pics = picturePickerController.pictures;
     if (pics.isNotEmpty) {
-      picturePickerController.setUploaded(0);
-      picturePickerController.setUploading(true);
+      picturePickerController.removeAllUploaded();
 
       ErrorAction uploadErrs = ErrorAction(
         response: (r) {
           // OccSnackBar.error(context, r.data['code']);
-          print(r.data);
+          // print(r.data);
         },
         connection: () {
           // OccSnackBar.error(context, internetConnectionErrorLabel);
-          print('connection');
+          // print('connection');
         },
         cancel: () {
-          print('cancel');
+          // print('cancel');
           // OccSnackBar.error(context, canceledFormLabel);
         },
       );
       // upload
       for (int j = 0; j < pics.length; j++) {
+        picturePickerController.setUploading(j);
         File _file = File(pics[j].path);
         dynamic __result = await Services.upload(_file, uploadErrs);
         // success
@@ -209,10 +217,11 @@ class _AddFileState extends State<AddFile> {
           done(false);
           return;
         }
-        picturePickerController.setUploaded(j + 1);
+        picturePickerController.addUploaded(j);
       }
-      picturePickerController.setUploading(false);
+      picturePickerController.setUploading(-1);
     }
+
     // ************** upload pictures
     // ******************************
     // *
@@ -325,6 +334,7 @@ class _AddFileState extends State<AddFile> {
     final generalData = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: ListView(
+        controller: generalDataScrollController,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),

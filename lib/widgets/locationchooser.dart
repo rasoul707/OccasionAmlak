@@ -27,6 +27,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
   fullScreen() async {
     FocusScope.of(context).unfocus();
     if (widget.enabled is bool && widget.enabled == false) return;
+    await Future.delayed(const Duration(milliseconds: 250));
     final MapData? result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -58,7 +59,6 @@ class _ChooseLocationState extends State<ChooseLocation> {
                               label: currentLocationLabel,
                               type: 'cancel',
                               onPressed: () {
-                                print('my loc');
                                 locateUser(mc);
                               },
                             ),
@@ -71,7 +71,6 @@ class _ChooseLocationState extends State<ChooseLocation> {
                             child: OccButton(
                               label: setMapPointLabel,
                               onPressed: () {
-                                print('set');
                                 Navigator.pop(
                                   context,
                                   MapData(
