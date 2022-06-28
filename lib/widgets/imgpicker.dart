@@ -91,10 +91,6 @@ class _PicturePickerState extends State<PicturePicker>
 
   @override
   void initState() {
-    final Animation<double> curve = CurvedAnimation(
-      parent: animationControllerBottomSheet,
-      curve: Curves.bounceIn,
-    );
 
     widget.controller.addListener(() {
       setState(() {

@@ -36,7 +36,7 @@ class _DashContentState extends State<DashContent> {
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       // _refreshIndicatorKey.currentState?.show();
       updateUserData(conError: true);
     });

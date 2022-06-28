@@ -264,7 +264,6 @@ class _AddFileState extends State<AddFile> {
         break;
     }
 
-    print(data.toJson());
 
     // error action
     ErrorAction _err = ErrorAction(

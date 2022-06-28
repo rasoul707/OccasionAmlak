@@ -4,7 +4,7 @@ import '../data/colors.dart';
 import '../data/strings.dart';
 import 'button.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart' as latLng;
+import 'package:latlong2/latlong.dart' as lalng;
 import 'package:geolocator/geolocator.dart';
 
 class ChooseLocation extends StatefulWidget {
@@ -151,7 +151,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
       desiredAccuracy: LocationAccuracy.high,
     );
 
-    var p = latLng.LatLng(cp.latitude, cp.longitude);
+    var p = lalng.LatLng(cp.latitude, cp.longitude);
     _map!.moveAndRotate(p, 15.0, 0.0);
   }
 
@@ -168,7 +168,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
           child: _MapContent(
             controller: _mapController,
             fullScreen: fullScreen,
-            center: latLng.LatLng(35.6973918, 51.3476617),
+            center: lalng.LatLng(35.6973918, 51.3476617),
           ),
         ),
       ),
@@ -189,7 +189,7 @@ class _MapContent extends StatelessWidget {
 
   final MapController? controller;
   final void Function()? fullScreen;
-  final latLng.LatLng? center;
+  final lalng.LatLng? center;
   final double? zoom;
   final double? rotation;
 
@@ -229,7 +229,7 @@ class _MapContent extends StatelessWidget {
 }
 
 class MapData {
-  latLng.LatLng? center;
+  lalng.LatLng? center;
   double? zoom;
   double? rotation;
 

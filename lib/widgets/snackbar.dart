@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/colors.dart';
-import '../data/strings.dart';
+
 
 class OccSnackBar {
   Color? textColor;

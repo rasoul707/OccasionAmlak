@@ -10,7 +10,6 @@ import 'main.dart';
 class Services {
   static dynamic errorHandler(Object obj, err, ty) {
     //
-    print(obj);
     if (obj.runtimeType == DioError) {
       obj = (obj as DioError);
       switch (obj.type) {

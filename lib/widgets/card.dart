@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../data/colors.dart';
+
 
 class OccCard extends StatelessWidget {
   final String head;
