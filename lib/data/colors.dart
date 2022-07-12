@@ -18,3 +18,6 @@ const errorColor = Color.fromRGBO(187, 33, 36, 1);
 const infoColor = Color.fromRGBO(91, 192, 222, 1);
 
 const whiteTextColor = Color.fromRGBO(255, 255, 255, 1);
+
+const lightBGColor = Color.fromRGBO(238, 238, 238, 1);
+const textLightBgColor = Color.fromRGBO(85, 85, 85, 1);

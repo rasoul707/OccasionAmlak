@@ -15,6 +15,8 @@ const confirmedFilesLabel = "فایل های تایید شده";
 const pendingFilesLabel = "در انتظار تایید";
 const newFileButton = "ثبت فایل جدید";
 const logoutButton = "خروج از حساب کاربری";
+const searchFileButton = "جستجوی فایل";
+
 const modalLogoutTitle = "خروج از حساب کاربری";
 const modalLogoutSubTitle = "آیا اطمینان دارید؟";
 const logoutDialogButtonYes = "بله";
@@ -62,8 +64,8 @@ const addFileFormLabels_city = "شهر";
 const addFileFormLabels_district = "منطقه";
 const addFileFormLabels_quarter = "محله";
 const addFileFormLabels_alley = "کوچه";
-const addFileFormLabels_price = "قیمت";
-
+const addFileFormLabels_price = "قیمت هر متر مربع (تومان)";
+const addFileFormLabels_description = "توضیحات";
 //
 //
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:occasionapp/screens/auth.dart';
+import '../api/main.dart';
+import '../models/response.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter_gravatar/flutter_gravatar.dart';
 
@@ -8,6 +9,7 @@ import '../api/services.dart';
 import '../data/colors.dart';
 import '../data/strings.dart';
 
+import '../helpers/numberConvertor.dart';
 import '../widgets/button.dart';
 import '../widgets/card.dart';
 
@@ -15,6 +17,8 @@ import '../models/user.dart';
 import '../helpers/user.dart';
 
 import '../screens/new.dart';
+import '../screens/auth.dart';
+import '../screens/search/main.dart';
 import '../widgets/snackbar.dart';
 
 class DashContent extends StatefulWidget {
@@ -27,6 +31,7 @@ class DashContent extends StatefulWidget {
 class _DashContentState extends State<DashContent> {
   bool _reload = false;
   bool disabled = false;
+
   reload() {
     setState(() {
       _reload = !_reload;
@@ -85,39 +90,39 @@ class _DashContentState extends State<DashContent> {
       Navigator.pushReplacement(
         context,
         PageTransition(
-          type: PageTransitionType.leftToRight,
+          type: PageTransitionType.bottomToTop,
           child: const AuthContent(),
         ),
       );
     }
   }
 
+  searchFile() {
+    Navigator.push(
+      context,
+      PageTransition(
+        type: PageTransitionType.bottomToTop,
+        child: const SearchContent(),
+      ),
+    ).then((_) => updateUserData(conError: false));
+  }
+
   // update user data
   Future<void> updateUserData({bool? conError}) async {
-    // error action
-    ErrorAction _err = ErrorAction(
-      response: (r) {
-        OccSnackBar.error(context, r.data['code']);
-      },
-      connection: () {
-        if (conError is bool && conError == false) {
-          //
-        } else {
-          OccSnackBar.error(context, internetConnectionErrorLabel);
-        }
-      },
-    );
-
-    User _result = await Services.getMe(_err);
+    API api = await apiService();
+    ApiResponse _result = await api.getMe().catchError(serviceError);
 
     // okay
-    if (_result.id != null) {
-      await saveUserData(_result);
+    if (_result.user != null) {
+      await saveUserData(_result.user!);
       reload();
+    } else {
+      OccSnackBar.error(context, _result.message ?? _result.code!);
     }
   }
 
   static const defaultAvatar = 'assets/images/default_avatar.png';
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<User>(
@@ -129,8 +134,7 @@ class _DashContentState extends State<DashContent> {
               MediaQuery.of(context).padding.top -
               MediaQuery.of(context).padding.bottom;
 
-          final displayName =
-              user.displayName != null ? user.displayName.toString() : "";
+          final displayName = user.displayName ?? "";
 
           final pendingCount =
               user.pending != null ? user.pending.toString() : "";
@@ -138,7 +142,7 @@ class _DashContentState extends State<DashContent> {
           final confirmedCount =
               user.confirmed != null ? user.confirmed.toString() : "";
 
-          String avatarUrl = '';
+          String avatarUrl = defaultAvatar;
           if (user.email != null) {
             final gravatar = Gravatar(user.email!);
             avatarUrl = gravatar.imageUrl();
@@ -178,7 +182,10 @@ class _DashContentState extends State<DashContent> {
                                         fadeOutDuration:
                                             const Duration(milliseconds: 300),
                                         imageErrorBuilder: (c, o, s) {
-                                          return const Scaffold();
+                                          return Image.asset(defaultAvatar);
+                                        },
+                                        placeholderErrorBuilder: (c, o, s) {
+                                          return Image.asset(defaultAvatar);
                                         },
                                       ),
                                     ),
@@ -204,23 +211,41 @@ class _DashContentState extends State<DashContent> {
                                 Expanded(
                                   child: OccCard(
                                     head: pendingFilesLabel,
-                                    sub: pendingCount,
+                                    sub: persianNumber(
+                                        int.tryParse(pendingCount)),
                                   ),
                                 ),
                                 Expanded(
                                   child: OccCard(
                                     head: confirmedFilesLabel,
-                                    sub: confirmedCount,
+                                    sub: persianNumber(
+                                        int.tryParse(confirmedCount)),
                                   ),
                                 ),
                               ],
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 40),
-                              child: OccButton(
-                                onPressed: addNewFile,
-                                label: newFileButton,
-                                enabled: !disabled,
+                              padding:
+                                  const EdgeInsets.only(top: 30, bottom: 10),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  OccButton(
+                                    onPressed: addNewFile,
+                                    label: newFileButton,
+                                    enabled: !disabled,
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 5, bottom: 5),
+                                  ),
+                                  OccButton(
+                                    onPressed: searchFile,
+                                    label: searchFileButton,
+                                    type: 'cancel',
+                                    enabled: !disabled,
+                                  ),
+                                ],
                               ),
                             ),
                             const Spacer(),

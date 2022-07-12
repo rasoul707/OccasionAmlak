@@ -11,6 +11,7 @@ class Villa {
   String? documentType;
   int? roomsCount;
   int? mastersCount;
+  List<String>? equipments;
 
   Villa({
     this.type,

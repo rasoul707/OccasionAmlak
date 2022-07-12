@@ -1,9 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:occasionapp/models/user.dart';
 import '../models/apartment.dart';
 import '../models/commercial.dart';
 import '../models/hectare.dart';
 import '../models/land.dart';
 import '../models/villa.dart';
+import 'image.dart';
 
 part 'casefile.g.dart';
 
@@ -16,17 +18,24 @@ class CaseFile {
   String? district;
   String? quarter;
   String? alley;
-  List<double>? location;
+  List<String>? location;
   int? price;
 
   List<int>? pictures;
   int? thumb;
+  List<ImageData>? picturesUrl;
+  ImageData? thumbUrl;
+  User? author;
+  String? description;
 
   Villa? villa;
   Apartment? apartment;
   Commercial? commercial;
   Hectare? hectare;
   Land? land;
+
+  DateTime? created;
+  DateTime? modified;
 
   CaseFile({
     this.id,
@@ -44,6 +53,7 @@ class CaseFile {
     this.commercial,
     this.hectare,
     this.land,
+    this.description,
   });
 
   factory CaseFile.fromJson(Map<String, dynamic> json) =>

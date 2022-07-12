@@ -4,7 +4,7 @@ part 'commercial.g.dart';
 
 @JsonSerializable()
 class Commercial {
-  String? type;
+  List<String>? type;
   double? area;
   String? documentType;
   int? floor;

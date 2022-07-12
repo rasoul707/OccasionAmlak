@@ -2,15 +2,19 @@ import 'dart:io';
 
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:occasionapp/widgets/imgpicker.dart';
 
+import '../api/main.dart';
 import '../helpers/addfile.dart';
+import '../helpers/numberConvertor.dart';
 import '../models/casefile.dart';
 import '../api/services.dart';
 import '../data/strings.dart';
 
+import '../models/response.dart';
 import '../widgets/button.dart';
 import '../widgets/locationchooser.dart';
 import '../widgets/snackbar.dart';
@@ -67,6 +71,7 @@ class _AddFileState extends State<AddFile> {
   final TextEditingController districtController = TextEditingController();
   final TextEditingController quarterController = TextEditingController();
   final TextEditingController alleyController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
   final MapController locationController = MapController();
 
   final FocusNode priceNode = FocusNode();
@@ -74,6 +79,7 @@ class _AddFileState extends State<AddFile> {
   final FocusNode districtNode = FocusNode();
   final FocusNode quarterNode = FocusNode();
   final FocusNode alleyNode = FocusNode();
+  final FocusNode descriptionNode = FocusNode();
 
   // =>
   AddVillaController addVillaController = AddVillaController();
@@ -161,6 +167,13 @@ class _AddFileState extends State<AddFile> {
 
   submit() async {
     var _e = _controller.errors;
+    List<XFile> pics = picturePickerController.pictures;
+    if (pics.isEmpty) {
+      const errPic = "باید حداقل یک عکس اضافه کنید";
+      if (!_e.contains(errPic)) {
+        _e.insert(0, errPic);
+      }
+    }
     if (_e.isNotEmpty) {
       OccSnackBar.error(context, _e.map((e) => "◀ " + e).toList().join("\n"));
       return;
@@ -182,44 +195,35 @@ class _AddFileState extends State<AddFile> {
     // ******************************
     List<int> _pictures = [];
     int? _thumb;
-    List<XFile> pics = picturePickerController.pictures;
+
     if (pics.isNotEmpty) {
       picturePickerController.removeAllUploaded();
 
-      ErrorAction uploadErrs = ErrorAction(
-        response: (r) {
-          // OccSnackBar.error(context, r.data['code']);
-          // print(r.data);
-        },
-        connection: () {
-          // OccSnackBar.error(context, internetConnectionErrorLabel);
-          // print('connection');
-        },
-        cancel: () {
-          // print('cancel');
-          // OccSnackBar.error(context, canceledFormLabel);
-        },
-      );
       // upload
       for (int j = 0; j < pics.length; j++) {
         picturePickerController.setUploading(j);
         File _file = File(pics[j].path);
-        dynamic __result = await Services.upload(_file, uploadErrs);
+
+        API api = await apiService();
+        ApiResponse _result = await api.upload(_file).catchError(serviceError);
         // success
-        if (__result != false) {
-          int? imgID = __result['id'];
+        if (_result.id != null) {
+          int? imgID = _result.id;
           // print(imgID);
           if (j == picturePickerController.thumb) {
             _thumb = imgID;
+          } else {
+            _pictures.add(imgID!);
           }
-          _pictures.add(imgID!);
         } else {
           done(false);
+          OccSnackBar.error(context, _result.message ?? _result.code!);
           return;
         }
         picturePickerController.addUploaded(j);
       }
       picturePickerController.setUploading(-1);
+      _pictures.insert(0, _thumb!);
     }
 
     // ************** upload pictures
@@ -236,10 +240,11 @@ class _AddFileState extends State<AddFile> {
       district: districtController.text,
       quarter: quarterController.text,
       alley: alleyController.text,
+      description: descriptionController.text,
       location: [
-        locationController.center.latitude,
-        locationController.center.longitude,
-        locationController.zoom,
+        locationController.center.latitude.toString(),
+        locationController.center.longitude.toString(),
+        locationController.zoom.toString(),
       ],
       pictures: _pictures,
       thumb: _thumb,
@@ -264,31 +269,18 @@ class _AddFileState extends State<AddFile> {
         break;
     }
 
-
-    // error action
-    ErrorAction _err = ErrorAction(
-      response: (r) {
-        OccSnackBar.error(context, r.data['code']);
-      },
-      connection: () {
-        OccSnackBar.error(context, internetConnectionErrorLabel);
-      },
-      cancel: () {
-        OccSnackBar.error(context, canceledFormLabel);
-      },
-    );
-
     // call api
-    int _result = await Services.addFile(data, _err);
+    API api = await apiService();
+    ApiResponse _result = await api.addFile(data).catchError(serviceError);
 
     // okay
-    if (_result > 0) {
+    if (_result.file != null && _result.file?.id != null) {
       done(true);
     } else {
       done(false);
+      OccSnackBar.error(context, _result.message ?? _result.code!);
     }
     // finish
-    //
   }
 
   @override
@@ -358,6 +350,7 @@ class _AddFileState extends State<AddFile> {
               keyboardType: TextInputType.number,
               decoration:
                   const InputDecoration(labelText: addFileFormLabels_price),
+              inputFormatters: [CurrencyInputFormatter()],
             ),
           ),
           Padding(
@@ -416,16 +409,36 @@ class _AddFileState extends State<AddFile> {
             child: TextFormField(
               controller: alleyController,
               enabled: !disabled,
-              textInputAction: TextInputAction.done,
+              textInputAction: TextInputAction.next,
               onEditingComplete: () {
-                alleyNode.unfocus();
+                descriptionNode.unfocus();
               },
               focusNode: alleyNode,
               enableSuggestions: true,
               autocorrect: true,
               keyboardType: TextInputType.text,
-              decoration:
-                  const InputDecoration(labelText: addFileFormLabels_alley),
+              decoration: const InputDecoration(
+                labelText: addFileFormLabels_alley,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              controller: descriptionController,
+              enabled: !disabled,
+              textInputAction: TextInputAction.newline,
+              focusNode: descriptionNode,
+              keyboardType: TextInputType.multiline,
+              decoration: const InputDecoration(
+                labelText: addFileFormLabels_description,
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 25,
+                ),
+              ),
+              minLines: 5,
+              maxLines: 5,
             ),
           ),
           Padding(
@@ -527,7 +540,7 @@ class AddFileController extends AddFileControllerErrorHandler {
   }
 
   void setPrice(v) {
-    data.price = int.tryParse(v);
+    data.price = int.tryParse(standardizeNumber(v));
     checkCondition();
   }
 

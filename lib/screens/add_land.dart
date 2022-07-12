@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../helpers/addfile.dart';
+import '../helpers/file.dart';
+import '../helpers/numberConvertor.dart';
 import '../models/land.dart';
 import '../data/strings.dart';
 import '../widgets/selectlist.dart';
-
-const usageStatusItems = [
-  "مسکونی",
-  "زراعی و کشاورزی",
-  "جنگل جلگه ای",
-  "اداری و تجاری",
-];
-
-const tissueStatusItems = ["داخل بافت", "الحاق به بافت", "خارج بافت"];
 
 class AddLand extends StatefulWidget {
   const AddLand({
@@ -31,14 +25,14 @@ class _AddLandState extends State<AddLand> {
 //
 
   final FocusNode areaNode = FocusNode();
-  final FocusNode documentTypeNode = FocusNode();
 
   final OccSelectListController usageStatusController =
       OccSelectListController();
   final OccSelectListController tissueStatusController =
       OccSelectListController();
   final TextEditingController areaController = TextEditingController();
-  final TextEditingController documentTypeController = TextEditingController();
+  final OccSelectListController documentTypeController =
+      OccSelectListController();
 
   @override
   void initState() {
@@ -52,7 +46,7 @@ class _AddLandState extends State<AddLand> {
       widget.controller.setArea(areaController.text);
     });
     documentTypeController.addListener(() {
-      widget.controller.setDocumentType(documentTypeController.text);
+      widget.controller.setDocumentType(documentTypeController.active);
     });
     widget.controller.checkCondition();
     super.initState();
@@ -67,7 +61,7 @@ class _AddLandState extends State<AddLand> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: OccSelectList(
-              items: usageStatusItems,
+              items: usageStatusLandHectare,
               enabled: !widget.disabled,
               controller: usageStatusController,
             ),
@@ -75,7 +69,7 @@ class _AddLandState extends State<AddLand> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: OccSelectList(
-              items: tissueStatusItems,
+              items: tissueStatusLandHectare,
               enabled: !widget.disabled,
               controller: tissueStatusController,
             ),
@@ -88,7 +82,7 @@ class _AddLandState extends State<AddLand> {
               enabled: !widget.disabled,
               textInputAction: TextInputAction.next,
               onEditingComplete: () {
-                documentTypeNode.requestFocus();
+                FocusScope.of(context).unfocus();
               },
               textDirection: TextDirection.ltr,
               enableSuggestions: false,
@@ -97,24 +91,16 @@ class _AddLandState extends State<AddLand> {
               decoration: const InputDecoration(
                 labelText: landFormLabels_area,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: TextFormField(
-              focusNode: documentTypeNode,
+            child: OccSelectList(
+              items: documentsListTypes,
               controller: documentTypeController,
               enabled: !widget.disabled,
-              textInputAction: TextInputAction.done,
-              onEditingComplete: () {
-                FocusScope.of(context).unfocus();
-              },
-              enableSuggestions: true,
-              autocorrect: true,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                labelText: landFormLabels_documentType,
-              ),
+              multiple: false,
             ),
           ),
         ],
@@ -129,11 +115,11 @@ class AddLandController extends AddFileControllerErrorHandler {
   @override
   void checkCondition() {
     errorHandler(
-      condition: (isOneOf(data.usageStatus, usageStatusItems)),
+      condition: (isOneOf(data.usageStatus, usageStatusLandHectare)),
       error: "وضعیت کاربری را انتخاب کنید",
     );
     errorHandler(
-      condition: (isOneOf(data.tissueStatus, tissueStatusItems)),
+      condition: (isOneOf(data.tissueStatus, tissueStatusLandHectare)),
       error: "وضعیت بافت را انتخاب کنید",
     );
     errorHandler(
@@ -141,8 +127,8 @@ class AddLandController extends AddFileControllerErrorHandler {
       error: "متراژ را به درستی وارد کنید",
     );
     errorHandler(
-      condition: (isRealString(data.documentType)),
-      error: "نوع سند را وارد کنید",
+      condition: (isOneOf(data.documentType, documentsListTypes)),
+      error: "نوع سند را انتخاب کنید",
     );
     notifyListeners();
   }
@@ -158,7 +144,7 @@ class AddLandController extends AddFileControllerErrorHandler {
   }
 
   void setArea(v) {
-    data.area = double.tryParse(v);
+    data.area = double.tryParse(standardizeNumber(v));
     checkCondition();
   }
 

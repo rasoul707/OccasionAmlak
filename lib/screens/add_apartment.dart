@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../helpers/addfile.dart';
+import '../helpers/file.dart';
+import '../helpers/numberConvertor.dart';
 import '../models/apartment.dart';
 import '../data/strings.dart';
 import '../widgets/selectlist.dart';
@@ -25,7 +27,6 @@ class _AddApartmentState extends State<AddApartment> {
   final FocusNode unitsCountNode = FocusNode();
   final FocusNode floorNode = FocusNode();
   final FocusNode areaNode = FocusNode();
-  final FocusNode documentTypeNode = FocusNode();
   final FocusNode roomsCountNode = FocusNode();
   final FocusNode mastersCountNode = FocusNode();
 
@@ -33,7 +34,8 @@ class _AddApartmentState extends State<AddApartment> {
   final TextEditingController unitsCountController = TextEditingController();
   final TextEditingController floorController = TextEditingController();
   final TextEditingController areaController = TextEditingController();
-  final TextEditingController documentTypeController = TextEditingController();
+  final OccSelectListController documentTypeController =
+      OccSelectListController();
   final TextEditingController roomsCountController = TextEditingController();
   final TextEditingController mastersCountController = TextEditingController();
   final OccSelectListController equipmentsController =
@@ -54,7 +56,7 @@ class _AddApartmentState extends State<AddApartment> {
       widget.controller.setArea(areaController.text);
     });
     documentTypeController.addListener(() {
-      widget.controller.setDocumentType(documentTypeController.text);
+      widget.controller.setDocumentType(documentTypeController.active);
     });
     roomsCountController.addListener(() {
       widget.controller.setRoomsCount(roomsCountController.text);
@@ -92,6 +94,7 @@ class _AddApartmentState extends State<AddApartment> {
               decoration: const InputDecoration(
                 labelText: apartmentFormLabels_floorsCount,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
@@ -111,6 +114,7 @@ class _AddApartmentState extends State<AddApartment> {
               decoration: const InputDecoration(
                 labelText: apartmentFormLabels_unitsCount,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
@@ -130,6 +134,7 @@ class _AddApartmentState extends State<AddApartment> {
               decoration: const InputDecoration(
                 labelText: apartmentFormLabels_floor,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
@@ -140,7 +145,7 @@ class _AddApartmentState extends State<AddApartment> {
               enabled: !widget.disabled,
               textInputAction: TextInputAction.next,
               onEditingComplete: () {
-                documentTypeNode.requestFocus();
+                roomsCountNode.requestFocus();
               },
               textDirection: TextDirection.ltr,
               enableSuggestions: false,
@@ -149,24 +154,16 @@ class _AddApartmentState extends State<AddApartment> {
               decoration: const InputDecoration(
                 labelText: apartmentFormLabels_area,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: TextFormField(
-              focusNode: documentTypeNode,
+            child: OccSelectList(
+              items: documentsListTypes,
               controller: documentTypeController,
               enabled: !widget.disabled,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                roomsCountNode.requestFocus();
-              },
-              enableSuggestions: true,
-              autocorrect: true,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                labelText: apartmentFormLabels_documentType,
-              ),
+              multiple: false,
             ),
           ),
           Padding(
@@ -186,6 +183,7 @@ class _AddApartmentState extends State<AddApartment> {
               decoration: const InputDecoration(
                 labelText: apartmentFormLabels_roomsCount,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
@@ -205,21 +203,13 @@ class _AddApartmentState extends State<AddApartment> {
               decoration: const InputDecoration(
                 labelText: apartmentFormLabels_mastersCount,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: OccSelectList(
-              items: const [
-                "انباری",
-                "پارکینگ",
-                "آسانسور",
-                "سونا",
-                "جکوزی",
-                "مبله",
-                "کمد دیواری",
-                "ویو"
-              ],
+              items: apartmentEquipmentsList,
               controller: equipmentsController,
               enabled: !widget.disabled,
               multiple: true,
@@ -254,8 +244,8 @@ class AddApartmentController extends AddFileControllerErrorHandler {
       error: "متراژ را به درستی وارد کنید",
     );
     errorHandler(
-      condition: (isRealString(data.documentType)),
-      error: "نوع سند را وارد کنید",
+      condition: (isOneOf(data.documentType, documentsListTypes)),
+      error: "نوع سند را انتخاب کنید",
     );
     errorHandler(
       condition: (data.roomsCount is int),
@@ -270,22 +260,22 @@ class AddApartmentController extends AddFileControllerErrorHandler {
   }
 
   void setFloorsCount(v) {
-    data.floorsCount = int.tryParse(v);
+    data.floorsCount = int.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
   void setUnitsCount(v) {
-    data.unitsCount = int.tryParse(v);
+    data.unitsCount = int.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
   void setFloor(v) {
-    data.floor = int.tryParse(v);
+    data.floor = int.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
   void setArea(v) {
-    data.area = double.tryParse(v);
+    data.area = double.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
@@ -295,12 +285,12 @@ class AddApartmentController extends AddFileControllerErrorHandler {
   }
 
   void setRoomsCount(v) {
-    data.roomsCount = int.tryParse(v);
+    data.roomsCount = int.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
   void setMastersCount(v) {
-    data.mastersCount = int.tryParse(v);
+    data.mastersCount = int.tryParse(standardizeNumber(v));
     checkCondition();
   }
 

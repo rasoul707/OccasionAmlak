@@ -4,9 +4,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:theme_mode_handler/theme_mode_handler.dart';
 
+import 'api/main.dart';
 import 'api/services.dart';
 import 'data/strings.dart';
 
+import 'models/response.dart';
 import 'screens/splash.dart';
 import 'screens/auth.dart';
 import 'screens/dash.dart';
@@ -82,27 +84,11 @@ class _RootAppState extends State<RootApp> {
     bool showDashboard = false;
     bool hasUser = await hasUserData();
 
-    // error action
-    ErrorAction _err = ErrorAction(
-      response: (r) {
-        showDashboard = false;
-      },
-      connection: () async {
-        if (hasUser) {
-          showDashboard = true;
-        } else {
-          showDashboard = false;
-        }
-      },
-      cancel: () {
-        showDashboard = true;
-      },
-    );
-
-    String _result = await Services.authentication(_err);
+    API api = await apiService();
+    ApiResponse _result = await api.validate().catchError(serviceError);
 
     // okay
-    if (_result.isNotEmpty) showDashboard = true;
+    if (_result.code! == "jwt_auth_valid_token") showDashboard = true;
 
     // finish
     Navigator.pushReplacement(

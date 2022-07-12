@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../helpers/addfile.dart';
+import '../helpers/file.dart';
+import '../helpers/numberConvertor.dart';
 import '../models/commercial.dart';
 import '../data/strings.dart';
 import '../widgets/selectlist.dart';
-
-const typesItems = ["اداری", "تجاری", "مغازه", "صنعتی", "دامداری و کشاورزی"];
 
 class AddCommercial extends StatefulWidget {
   const AddCommercial({
@@ -22,13 +22,13 @@ class AddCommercial extends StatefulWidget {
 
 class _AddCommercialState extends State<AddCommercial> {
   final FocusNode areaNode = FocusNode();
-  final FocusNode documentTypeNode = FocusNode();
   final FocusNode floorNode = FocusNode();
   final FocusNode commercialAreaNode = FocusNode();
 
   final OccSelectListController typeController = OccSelectListController();
   final TextEditingController areaController = TextEditingController();
-  final TextEditingController documentTypeController = TextEditingController();
+  final OccSelectListController documentTypeController =
+      OccSelectListController();
   final TextEditingController floorController = TextEditingController();
   final TextEditingController commercialAreaController =
       TextEditingController();
@@ -36,13 +36,13 @@ class _AddCommercialState extends State<AddCommercial> {
   @override
   void initState() {
     typeController.addListener(() {
-      widget.controller.setType(typeController.active);
+      widget.controller.setType(typeController.activeItems);
     });
     areaController.addListener(() {
       widget.controller.setArea(areaController.text);
     });
     documentTypeController.addListener(() {
-      widget.controller.setDocumentType(documentTypeController.text);
+      widget.controller.setDocumentType(documentTypeController.active);
     });
     floorController.addListener(() {
       widget.controller.setFloor(floorController.text);
@@ -63,9 +63,10 @@ class _AddCommercialState extends State<AddCommercial> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: OccSelectList(
-              items: typesItems,
+              items: commercialTypesItems,
               controller: typeController,
               enabled: !widget.disabled,
+              multiple: true,
             ),
           ),
           Padding(
@@ -76,7 +77,7 @@ class _AddCommercialState extends State<AddCommercial> {
               enabled: !widget.disabled,
               textInputAction: TextInputAction.next,
               onEditingComplete: () {
-                FocusScope.of(context).requestFocus(documentTypeNode);
+                floorNode.requestFocus();
               },
               textDirection: TextDirection.ltr,
               enableSuggestions: false,
@@ -85,24 +86,16 @@ class _AddCommercialState extends State<AddCommercial> {
               decoration: const InputDecoration(
                 labelText: commercialFormLabels_area,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: TextFormField(
-              focusNode: documentTypeNode,
+            child: OccSelectList(
+              items: documentsListTypes,
               controller: documentTypeController,
               enabled: !widget.disabled,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                FocusScope.of(context).requestFocus(floorNode);
-              },
-              enableSuggestions: true,
-              autocorrect: true,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                labelText: commercialFormLabels_documentType,
-              ),
+              multiple: false,
             ),
           ),
           Padding(
@@ -113,7 +106,7 @@ class _AddCommercialState extends State<AddCommercial> {
               enabled: !widget.disabled,
               textInputAction: TextInputAction.next,
               onEditingComplete: () {
-                FocusScope.of(context).requestFocus(commercialAreaNode);
+                commercialAreaNode.requestFocus();
               },
               textDirection: TextDirection.ltr,
               enableSuggestions: false,
@@ -122,6 +115,7 @@ class _AddCommercialState extends State<AddCommercial> {
               decoration: const InputDecoration(
                 labelText: commercialFormLabels_floor,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
@@ -141,6 +135,7 @@ class _AddCommercialState extends State<AddCommercial> {
               decoration: const InputDecoration(
                 labelText: commercialFormLabels_commercialArea,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
         ],
@@ -155,7 +150,12 @@ class AddCommercialController extends AddFileControllerErrorHandler {
   @override
   void checkCondition() {
     errorHandler(
-      condition: (isOneOf(data.type, typesItems)),
+      condition: (data.type != null &&
+          data.type!.isNotEmpty &&
+          isOneOf(
+            data.type!.elementAt(0),
+            commercialTypesItems,
+          )),
       error: "نوع ملک را انتخاب کنید",
     );
     errorHandler(
@@ -163,8 +163,8 @@ class AddCommercialController extends AddFileControllerErrorHandler {
       error: "متراژ را به درستی وارد کنید",
     );
     errorHandler(
-      condition: (isRealString(data.documentType)),
-      error: "نوع سند را وارد کنید",
+      condition: (isOneOf(data.documentType, documentsListTypes)),
+      error: "نوع سند را انتخاب کنید",
     );
     errorHandler(
       condition: (data.floor is int),
@@ -183,7 +183,7 @@ class AddCommercialController extends AddFileControllerErrorHandler {
   }
 
   void setArea(v) {
-    data.area = double.tryParse(v);
+    data.area = double.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
@@ -193,12 +193,12 @@ class AddCommercialController extends AddFileControllerErrorHandler {
   }
 
   void setFloor(v) {
-    data.floor = int.tryParse(v);
+    data.floor = int.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
   void setCommercialArea(v) {
-    data.commercialArea = double.tryParse(v);
+    data.commercialArea = double.tryParse(standardizeNumber(v));
     checkCondition();
   }
 }

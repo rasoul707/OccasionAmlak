@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../helpers/addfile.dart';
+import '../helpers/file.dart';
+import '../helpers/numberConvertor.dart';
 import '../models/villa.dart';
 import '../data/strings.dart';
 import '../widgets/selectlist.dart';
@@ -26,7 +28,6 @@ class _AddVillaState extends State<AddVilla> {
   final FocusNode landAreaNode = FocusNode();
   final FocusNode buildingAreaNode = FocusNode();
   final FocusNode constructionYearNode = FocusNode();
-  final FocusNode documentTypeNode = FocusNode();
   final FocusNode roomsCountNode = FocusNode();
   final FocusNode mastersCountNode = FocusNode();
 
@@ -35,9 +36,12 @@ class _AddVillaState extends State<AddVilla> {
   final TextEditingController buildingAreaController = TextEditingController();
   final TextEditingController constructionYearController =
       TextEditingController();
-  final TextEditingController documentTypeController = TextEditingController();
   final TextEditingController roomsCountController = TextEditingController();
   final TextEditingController mastersCountController = TextEditingController();
+  final OccSelectListController documentTypeController =
+      OccSelectListController();
+  final OccSelectListController equipmentsController =
+      OccSelectListController();
 
   @override
   void initState() {
@@ -54,13 +58,16 @@ class _AddVillaState extends State<AddVilla> {
       widget.controller.setConstructionYear(constructionYearController.text);
     });
     documentTypeController.addListener(() {
-      widget.controller.setDocumentType(documentTypeController.text);
+      widget.controller.setDocumentType(documentTypeController.active);
     });
     roomsCountController.addListener(() {
       widget.controller.setRoomsCount(roomsCountController.text);
     });
     mastersCountController.addListener(() {
       widget.controller.setMastersCount(mastersCountController.text);
+    });
+    equipmentsController.addListener(() {
+      widget.controller.setEquipments(equipmentsController.activeItems);
     });
     widget.controller.checkCondition();
     super.initState();
@@ -97,6 +104,7 @@ class _AddVillaState extends State<AddVilla> {
               decoration: const InputDecoration(
                 labelText: villaFormLabels_landArea,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
@@ -116,6 +124,7 @@ class _AddVillaState extends State<AddVilla> {
               decoration: const InputDecoration(
                 labelText: villaFormLabels_buildingArea,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
@@ -126,7 +135,7 @@ class _AddVillaState extends State<AddVilla> {
               enabled: !widget.disabled,
               textInputAction: TextInputAction.next,
               onEditingComplete: () {
-                documentTypeNode.requestFocus();
+                roomsCountNode.requestFocus();
               },
               textDirection: TextDirection.ltr,
               enableSuggestions: false,
@@ -135,24 +144,16 @@ class _AddVillaState extends State<AddVilla> {
               decoration: const InputDecoration(
                 labelText: villaFormLabels_constructionYear,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: TextFormField(
-              focusNode: documentTypeNode,
+            child: OccSelectList(
+              items: documentsListTypes,
               controller: documentTypeController,
               enabled: !widget.disabled,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                roomsCountNode.requestFocus();
-              },
-              enableSuggestions: true,
-              autocorrect: true,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                labelText: villaFormLabels_documentType,
-              ),
+              multiple: false,
             ),
           ),
           Padding(
@@ -172,6 +173,7 @@ class _AddVillaState extends State<AddVilla> {
               decoration: const InputDecoration(
                 labelText: villaFormLabels_roomsCount,
               ),
+              inputFormatters: [NumberInputFormatter()],
             ),
           ),
           Padding(
@@ -191,6 +193,16 @@ class _AddVillaState extends State<AddVilla> {
               decoration: const InputDecoration(
                 labelText: villaFormLabels_mastersCount,
               ),
+              inputFormatters: [NumberInputFormatter()],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: OccSelectList(
+              items: villaEquipmentsList,
+              controller: equipmentsController,
+              enabled: !widget.disabled,
+              multiple: true,
             ),
           ),
         ],
@@ -221,8 +233,8 @@ class AddVillaController extends AddFileControllerErrorHandler {
       error: "سال ساخت را به درستی وارد کنید",
     );
     errorHandler(
-      condition: (isRealString(data.documentType)),
-      error: "نوع سند را وارد کنید",
+      condition: (isOneOf(data.documentType, documentsListTypes)),
+      error: "نوع سند را انتخاب کنید",
     );
     errorHandler(
       condition: (data.roomsCount is int),
@@ -242,17 +254,17 @@ class AddVillaController extends AddFileControllerErrorHandler {
   }
 
   void setLandArea(v) {
-    data.landArea = double.tryParse(v);
+    data.landArea = double.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
   void setBuildingArea(v) {
-    data.buildingArea = double.tryParse(v);
+    data.buildingArea = double.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
   void setConstructionYear(v) {
-    data.constructionYear = int.tryParse(v);
+    data.constructionYear = int.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
@@ -262,12 +274,17 @@ class AddVillaController extends AddFileControllerErrorHandler {
   }
 
   void setRoomsCount(v) {
-    data.roomsCount = int.tryParse(v);
+    data.roomsCount = int.tryParse(standardizeNumber(v));
     checkCondition();
   }
 
   void setMastersCount(v) {
-    data.mastersCount = int.tryParse(v);
+    data.mastersCount = int.tryParse(standardizeNumber(v));
+    checkCondition();
+  }
+
+  void setEquipments(v) {
+    data.equipments = v;
     checkCondition();
   }
 }

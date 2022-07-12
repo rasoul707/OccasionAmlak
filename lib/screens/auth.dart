@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:occasionapp/models/response.dart';
 import 'package:page_transition/page_transition.dart';
 
+import '../api/main.dart';
 import '../api/services.dart';
 import '../data/strings.dart';
 import '../models/user.dart';
@@ -49,17 +51,18 @@ class _AuthContentState extends State<AuthContent> {
     final String password = passwordController.text;
     final LoginReq req = LoginReq(username: username, password: password);
 
-    // error action
-    ErrorAction _err = ErrorAction(
-      response: (r) {
-        OccSnackBar.error(context, r.data['code']);
-      },
-      connection: () {
-        OccSnackBar.error(context, internetConnectionErrorLabel);
-      },
-    );
+    // // error action
+    // ErrorAction _err = ErrorAction(
+    //   response: (r) {
+    //     OccSnackBar.error(context, r.data['code']);
+    //   },
+    //   connection: () {
+    //     OccSnackBar.error(context, internetConnectionErrorLabel);
+    //   },
+    // );
 
-    LoginRes _result = await Services.login(req, _err);
+    API api = await apiService();
+    ApiResponse _result = await api.login(req).catchError(serviceError);
 
     // okay
     if (_result.token != null) {
@@ -74,6 +77,8 @@ class _AuthContentState extends State<AuthContent> {
           child: const DashContent(),
         ),
       );
+    } else {
+      OccSnackBar.error(context, _result.message ?? _result.code!);
     }
 
     // finish
