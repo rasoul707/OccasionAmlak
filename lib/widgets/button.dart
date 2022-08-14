@@ -60,6 +60,7 @@ class OccButton extends StatelessWidget {
       style: const TextStyle(
         color: textColor,
         fontWeight: FontWeight.w500,
+        fontSize: 18,
       ),
     );
     if (loading is bool && loading == true) {

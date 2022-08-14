@@ -43,7 +43,7 @@ class RMFileViewItem extends StatelessWidget {
           Row(
             children: [
               const Icon(
-                Icons.straighten,
+                Icons.aspect_ratio,
                 color: textLightBgColor,
               ),
               const Padding(
@@ -92,7 +92,7 @@ class RMFileViewItem extends StatelessWidget {
           Row(
             children: [
               const Icon(
-                Icons.straighten,
+                Icons.aspect_ratio,
                 color: textLightBgColor,
               ),
               const Padding(
@@ -142,7 +142,7 @@ class RMFileViewItem extends StatelessWidget {
           Row(
             children: [
               const Icon(
-                Icons.straighten,
+                Icons.aspect_ratio,
                 color: textLightBgColor,
               ),
               const Padding(
@@ -172,7 +172,7 @@ class RMFileViewItem extends StatelessWidget {
           Row(
             children: [
               const Icon(
-                Icons.straighten,
+                Icons.aspect_ratio,
                 color: textLightBgColor,
               ),
               const Padding(
@@ -202,7 +202,7 @@ class RMFileViewItem extends StatelessWidget {
           Row(
             children: [
               const Icon(
-                Icons.straighten,
+                Icons.aspect_ratio,
                 color: textLightBgColor,
               ),
               const Padding(
@@ -225,15 +225,15 @@ class RMFileViewItem extends StatelessWidget {
     const defaultHome = 'assets/images/file_placeholder.png';
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(30),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(30),
         onTap: () {
           openFile(context, file.id!);
         },
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
@@ -242,7 +242,7 @@ class RMFileViewItem extends StatelessWidget {
               Center(
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(
-                    Radius.circular(50),
+                    Radius.circular(30),
                   ),
                   child: FadeInImage.assetNetwork(
                     placeholder: defaultHome,
@@ -263,7 +263,9 @@ class RMFileViewItem extends StatelessWidget {
               const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
               ),
               const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
               Row(
@@ -273,12 +275,12 @@ class RMFileViewItem extends StatelessWidget {
                   Container(
                     height: 85,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(60),
+                      borderRadius: BorderRadius.circular(35),
                       color: lightBGColor,
                     ),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 25,
-                      vertical: 5,
+                      vertical: 10,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

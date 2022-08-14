@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:occasionapp/helpers/numberConvertor.dart';
-import 'package:occasionapp/models/casefile.dart';
-import 'package:page_transition/page_transition.dart';
+import '../../helpers/numberConvertor.dart';
+import '../../models/casefile.dart';
 import '../../api/main.dart';
 import '../../api/services.dart';
 import '../../models/response.dart';
@@ -10,7 +9,6 @@ import '../../widgets/RMAppBar.dart';
 import '../../data/colors.dart';
 import '../../widgets/selectlist.dart';
 import '../../widgets/snackbar.dart';
-import '../fileView/main.dart';
 
 const sortingItems = ['جدیدترین', 'قدیمی ترین', 'ارزان ترین', 'گران ترین'];
 const sortingItemsVal = ['-time', 'time', 'price', '-price'];
@@ -50,13 +48,15 @@ class _SearchListState extends State<SearchList> {
 
   Future<void> searchFiles() async {
     API api = await apiService();
-    ApiResponse _result = await api.searchFile(
-      widget.type!.join(","),
-      widget.price!.join(","),
-      widget.district.toString(),
-      widget.area.toString(),
-      widget.buildingArea.toString(),
-    );
+    ApiResponse _result = await api
+        .searchFile(
+          widget.type!.join(","),
+          widget.price!.join(","),
+          widget.district.toString(),
+          widget.area.toString(),
+          widget.buildingArea.toString(),
+        )
+        .catchError(serviceError);
 
     if (_result.ok!) {
       if (_result.files == null || _result.files!.isEmpty) {

@@ -91,7 +91,6 @@ class _PicturePickerState extends State<PicturePicker>
 
   @override
   void initState() {
-
     widget.controller.addListener(() {
       setState(() {
         isUploading = widget.controller.isUploading;
@@ -135,7 +134,7 @@ class _PicturePickerState extends State<PicturePicker>
       onTap: onTap,
       child: Container(
         decoration: const BoxDecoration(
-          color: Colors.blueGrey,
+          color: Colors.purple,
           borderRadius: BorderRadius.all(
             Radius.circular(50),
           ),
@@ -310,7 +309,7 @@ class _PicturePanelState extends State<PicturePanel> {
           },
           child: const Icon(
             Icons.close,
-            color: Colors.red,
+            color: Color.fromARGB(255, 244, 67, 54),
           ),
         ),
         top: 4,

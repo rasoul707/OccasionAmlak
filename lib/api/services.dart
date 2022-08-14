@@ -24,6 +24,7 @@ ApiResponse serviceError(Object obj) {
         return ApiResponse(ok: false, code: "UnknownDioError");
     }
   }
+  print(obj);
   return ApiResponse(ok: false, code: "UnknownError");
 }
 

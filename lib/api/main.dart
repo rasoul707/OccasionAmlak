@@ -22,7 +22,7 @@ abstract class API {
   Future<ApiResponse> getMe();
 
   @POST("rapp/v1/addFile")
-  Future<ApiResponse> addFile(@Body() CaseFile data);
+  Future<dynamic> addFile(@Body() CaseFile data);
 
   @GET("rapp/v1/getFile/{id}")
   Future<ApiResponse> getFile(@Path("id") int id);

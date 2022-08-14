@@ -2,10 +2,9 @@ import 'dart:io';
 
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:occasionapp/widgets/imgpicker.dart';
+import '../widgets/imgpicker.dart';
 
 import '../api/main.dart';
 import '../helpers/addfile.dart';
@@ -167,13 +166,17 @@ class _AddFileState extends State<AddFile> {
 
   submit() async {
     var _e = _controller.errors;
+
+    // pic
     List<XFile> pics = picturePickerController.pictures;
-    if (pics.isEmpty) {
-      const errPic = "باید حداقل یک عکس اضافه کنید";
-      if (!_e.contains(errPic)) {
-        _e.insert(0, errPic);
-      }
+    const errPic = "باید حداقل یک عکس اضافه کنید";
+    if (pics.isEmpty && !_e.contains(errPic)) {
+      _e.insert(0, errPic);
+    } else if (pics.isNotEmpty && _e.contains(errPic)) {
+      _e.remove(errPic);
     }
+
+    //
     if (_e.isNotEmpty) {
       OccSnackBar.error(context, _e.map((e) => "◀ " + e).toList().join("\n"));
       return;

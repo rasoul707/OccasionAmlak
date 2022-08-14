@@ -50,8 +50,7 @@ List<String> villaEquipmentsList = [
   "جنگلی",
   "شهرکی",
   "شاه نشین",
-  "فول",
-  "فرنیش",
+  "فول فرنیش",
 ];
 
 const List<String> usageStatusLandHectare = [
@@ -79,7 +78,3 @@ const commercialTypesItems = [
   "دامداری و کشاورزی",
   "مسکونی",
 ];
-/*
-
-ل / نشی ن شا ه /شهرکی / جنگلی / ساحلی / سون ا / جکوز ی / گاردن روف / سازی حیا ط /  / 
-*/
