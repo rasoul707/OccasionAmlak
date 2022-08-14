@@ -29,7 +29,6 @@ class _OccSelectListState extends State<OccSelectList> {
         activeItems = widget.controller.activeItems;
       });
     });
-
     super.initState();
   }
 

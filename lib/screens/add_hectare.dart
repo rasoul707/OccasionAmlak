@@ -4,6 +4,7 @@ import '../helpers/file.dart';
 import '../helpers/numberConvertor.dart';
 import '../models/hectare.dart';
 import '../data/strings.dart';
+import '../widgets/RMCheckbox.dart';
 import '../widgets/selectlist.dart';
 
 class AddHectare extends StatefulWidget {
@@ -33,6 +34,8 @@ class _AddHectareState extends State<AddHectare> {
   final OccSelectListController documentTypeController =
       OccSelectListController();
 
+  final CheckboxController withOldBuildingController = CheckboxController();
+
   @override
   void initState() {
     usageStatusController.addListener(() {
@@ -46,6 +49,9 @@ class _AddHectareState extends State<AddHectare> {
     });
     documentTypeController.addListener(() {
       widget.controller.setDocumentType(documentTypeController.active);
+    });
+    withOldBuildingController.addListener(() {
+      widget.controller.setWithOldBuilding(withOldBuildingController.value);
     });
     widget.controller.checkCondition();
     super.initState();
@@ -102,6 +108,13 @@ class _AddHectareState extends State<AddHectare> {
               multiple: false,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: RMCheckbox(
+              label: 'دارای بنای قدیمی',
+              controller: withOldBuildingController,
+            ),
+          ),
         ],
       ),
     );
@@ -150,5 +163,10 @@ class AddHectareController extends AddFileControllerErrorHandler {
   void setDocumentType(v) {
     data.documentType = v;
     checkCondition();
+  }
+
+  void setWithOldBuilding(v) {
+    data.withOldBuilding = v;
+    notifyListeners();
   }
 }

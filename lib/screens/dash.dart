@@ -212,14 +212,16 @@ class _DashContentState extends State<DashContent> {
                                   child: OccCard(
                                     head: pendingFilesLabel,
                                     sub: persianNumber(
-                                        int.tryParse(pendingCount)),
+                                      int.tryParse(pendingCount),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: OccCard(
                                     head: confirmedFilesLabel,
                                     sub: persianNumber(
-                                        int.tryParse(confirmedCount)),
+                                      int.tryParse(confirmedCount),
+                                    ),
                                   ),
                                 ),
                               ],

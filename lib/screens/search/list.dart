@@ -21,6 +21,7 @@ class SearchList extends StatefulWidget {
     this.buildingArea,
     this.type,
     this.price,
+    this.canBarter,
   }) : super(key: key);
 
   String? district;
@@ -28,6 +29,7 @@ class SearchList extends StatefulWidget {
   double? buildingArea;
   List<String>? type;
   List<String>? price;
+  bool? canBarter;
 
   @override
   _SearchListState createState() => _SearchListState();
@@ -55,6 +57,7 @@ class _SearchListState extends State<SearchList> {
           widget.district.toString(),
           widget.area.toString(),
           widget.buildingArea.toString(),
+          widget.canBarter == true ? 1 : 0,
         )
         .catchError(serviceError);
 

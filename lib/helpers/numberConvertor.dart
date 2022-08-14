@@ -40,6 +40,11 @@ String priceFormat(dynamic input) {
   return oCcy.format(input);
 }
 
+String phoneFormat(dynamic input) {
+  final oCcy = NumberFormat("##########", "fa_IR");
+  return oCcy.format(input);
+}
+
 class CurrencyInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -52,8 +57,9 @@ class CurrencyInputFormatter extends TextInputFormatter {
     double? value = double.tryParse(standard);
     final formatted = priceFormat(value);
     return newValue.copyWith(
-        text: formatted,
-        selection: TextSelection.collapsed(offset: formatted.length));
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
   }
 }
 
@@ -71,7 +77,27 @@ class NumberInputFormatter extends TextInputFormatter {
     final formatted = persianNumber(value);
 
     return newValue.copyWith(
-        text: formatted,
-        selection: TextSelection.collapsed(offset: formatted.length));
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
+
+class PhoneInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
+    }
+
+    final standard = standardizeNumber(newValue.text);
+    double? value = double.tryParse(standard);
+    final formatted = phoneFormat(value);
+
+    return newValue.copyWith(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
   }
 }

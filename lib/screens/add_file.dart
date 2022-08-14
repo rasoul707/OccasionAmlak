@@ -4,6 +4,7 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:image_picker/image_picker.dart';
+import '../widgets/RMCheckbox.dart';
 import '../widgets/imgpicker.dart';
 
 import '../api/main.dart';
@@ -72,6 +73,10 @@ class _AddFileState extends State<AddFile> {
   final TextEditingController alleyController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final MapController locationController = MapController();
+  final CheckboxController canBarterController = CheckboxController();
+
+  final TextEditingController ownerNameController = TextEditingController();
+  final TextEditingController ownerPhoneController = TextEditingController();
 
   final FocusNode priceNode = FocusNode();
   final FocusNode cityNode = FocusNode();
@@ -79,6 +84,9 @@ class _AddFileState extends State<AddFile> {
   final FocusNode quarterNode = FocusNode();
   final FocusNode alleyNode = FocusNode();
   final FocusNode descriptionNode = FocusNode();
+
+  final FocusNode ownerNameNode = FocusNode();
+  final FocusNode ownerPhoneNode = FocusNode();
 
   // =>
   AddVillaController addVillaController = AddVillaController();
@@ -244,6 +252,11 @@ class _AddFileState extends State<AddFile> {
       quarter: quarterController.text,
       alley: alleyController.text,
       description: descriptionController.text,
+
+      canBarter: canBarterController.value,
+      ownerName: ownerNameController.text,
+      ownerPhone: ownerPhoneController.text,
+
       location: [
         locationController.center.latitude.toString(),
         locationController.center.longitude.toString(),
@@ -338,7 +351,7 @@ class _AddFileState extends State<AddFile> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.only(top: 10, bottom: 0),
             child: TextFormField(
               focusNode: priceNode,
               controller: priceController,
@@ -351,9 +364,18 @@ class _AddFileState extends State<AddFile> {
               enableSuggestions: false,
               autocorrect: false,
               keyboardType: TextInputType.number,
-              decoration:
-                  const InputDecoration(labelText: addFileFormLabels_price),
+              decoration: const InputDecoration(
+                labelText: addFileFormLabels_price,
+              ),
               inputFormatters: [CurrencyInputFormatter()],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 0, bottom: 10),
+            child: RMCheckbox(
+              label: 'قابل تهاتر',
+              controller: canBarterController,
+              enabled: !disabled,
             ),
           ),
           Padding(
@@ -428,6 +450,48 @@ class _AddFileState extends State<AddFile> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: TextFormField(
+              focusNode: ownerNameNode,
+              controller: ownerNameController,
+              enabled: !disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                ownerPhoneNode.requestFocus();
+              },
+              textDirection: TextDirection.rtl,
+              enableSuggestions: true,
+              autocorrect: true,
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                labelText: "نام مالک",
+              ),
+              // inputFormatters: [CurrencyInputFormatter()],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              focusNode: ownerPhoneNode,
+              controller: ownerPhoneController,
+              enabled: !disabled,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                descriptionNode.requestFocus();
+              },
+              textDirection: TextDirection.ltr,
+              enableSuggestions: true,
+              autocorrect: true,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "شماه تماس مالک",
+                suffixText: persianNumber(0),
+              ),
+              inputFormatters: [PhoneInputFormatter()],
+              // maxLength: 11,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
               controller: descriptionController,
               enabled: !disabled,
               textInputAction: TextInputAction.newline,
@@ -444,13 +508,13 @@ class _AddFileState extends State<AddFile> {
               maxLines: 5,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: ChooseLocation(
-              controller: locationController,
-              enabled: !disabled,
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(vertical: 10),
+          //   child: ChooseLocation(
+          //     controller: locationController,
+          //     enabled: !disabled,
+          //   ),
+          // ),
         ],
       ),
     );

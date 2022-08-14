@@ -34,6 +34,7 @@ abstract class API {
     @Query("district") String district,
     @Query("area") String area,
     @Query("buildingArea") String buildingArea,
+    @Query("canBarter") int canBarter,
   );
 
   @MultiPart()

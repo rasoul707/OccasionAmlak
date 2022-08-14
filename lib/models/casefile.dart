@@ -28,6 +28,11 @@ class CaseFile {
   User? author;
   String? description;
 
+  String? ownerName;
+  String? ownerPhone;
+
+  bool? canBarter;
+
   Villa? villa;
   Apartment? apartment;
   Commercial? commercial;
@@ -54,6 +59,9 @@ class CaseFile {
     this.hectare,
     this.land,
     this.description,
+    this.ownerName,
+    this.ownerPhone,
+    this.canBarter,
   });
 
   factory CaseFile.fromJson(Map<String, dynamic> json) =>

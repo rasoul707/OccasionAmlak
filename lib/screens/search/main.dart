@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
+import '../../widgets/RMCheckbox.dart';
 import '../../widgets/RMRangeSlider.dart';
 import '../../widgets/RMAppBar.dart';
 
@@ -22,6 +23,7 @@ class _SearchContentState extends State<SearchContent> {
   final TextEditingController areaController = TextEditingController();
   final TextEditingController buildingAreaController = TextEditingController();
   final RMRangeSliderController priceController = RMRangeSliderController();
+  final CheckboxController canBarterController = CheckboxController();
 
   @override
   void initState() {
@@ -90,6 +92,13 @@ class _SearchContentState extends State<SearchContent> {
                     maxPrice,
                     40,
                     controller: priceController,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 0, bottom: 10),
+                    child: RMCheckbox(
+                      label: 'قابل تهاتر',
+                      controller: canBarterController,
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20),

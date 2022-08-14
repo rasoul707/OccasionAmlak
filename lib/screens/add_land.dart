@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../helpers/addfile.dart';
 import '../helpers/file.dart';
 import '../helpers/numberConvertor.dart';
 import '../models/land.dart';
 import '../data/strings.dart';
+import '../widgets/RMCheckbox.dart';
 import '../widgets/selectlist.dart';
 
 class AddLand extends StatefulWidget {
@@ -34,6 +34,8 @@ class _AddLandState extends State<AddLand> {
   final OccSelectListController documentTypeController =
       OccSelectListController();
 
+  final CheckboxController withOldBuildingController = CheckboxController();
+
   @override
   void initState() {
     usageStatusController.addListener(() {
@@ -47,6 +49,9 @@ class _AddLandState extends State<AddLand> {
     });
     documentTypeController.addListener(() {
       widget.controller.setDocumentType(documentTypeController.active);
+    });
+    withOldBuildingController.addListener(() {
+      widget.controller.setWithOldBuilding(withOldBuildingController.value);
     });
     widget.controller.checkCondition();
     super.initState();
@@ -103,6 +108,14 @@ class _AddLandState extends State<AddLand> {
               multiple: false,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: RMCheckbox(
+              label: 'دارای بنای قدیمی',
+              controller: withOldBuildingController,
+              enabled: !widget.disabled,
+            ),
+          ),
         ],
       ),
     );
@@ -151,5 +164,10 @@ class AddLandController extends AddFileControllerErrorHandler {
   void setDocumentType(v) {
     data.documentType = v;
     checkCondition();
+  }
+
+  void setWithOldBuilding(v) {
+    data.withOldBuilding = v;
+    notifyListeners();
   }
 }
