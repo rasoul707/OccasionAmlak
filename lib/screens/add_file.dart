@@ -67,6 +67,7 @@ class _AddFileState extends State<AddFile> {
 
   // => general data
   final TextEditingController priceController = TextEditingController();
+  final TextEditingController totalPriceController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController districtController = TextEditingController();
   final TextEditingController quarterController = TextEditingController();
@@ -103,9 +104,64 @@ class _AddFileState extends State<AddFile> {
 
   @override
   void initState() {
-    priceController.addListener(() {
-      _controller.setPrice(priceController.text);
-    });
+    double? size = 1;
+
+    if (widget.index != 0) {
+      priceController.addListener(() {
+        switch (widget.index) {
+          case 0:
+            size = addVillaController.data.landArea;
+            break;
+          case 1:
+            size = addApartmentController.data.area;
+            break;
+          case 2:
+            size = addLandController.data.area;
+            break;
+          case 3:
+            size = addCommercialController.data.area;
+            break;
+          case 4:
+            size = addHectareController.data.area;
+            break;
+        }
+        _controller.setPrice(priceController.text);
+        int? p = int.tryParse(standardizeNumber(priceController.text));
+        if (p is int && size != null) {
+          totalPriceController.text = priceFormat(p * size!);
+        } else {
+          totalPriceController.text = priceFormat(0);
+        }
+      });
+    }
+    if (widget.index == 0) {
+      totalPriceController.addListener(() {
+        switch (widget.index) {
+          case 0:
+            size = addVillaController.data.landArea;
+            break;
+          case 1:
+            size = addApartmentController.data.area;
+            break;
+          case 2:
+            size = addLandController.data.area;
+            break;
+          case 3:
+            size = addCommercialController.data.area;
+            break;
+          case 4:
+            size = addHectareController.data.area;
+            break;
+        }
+        _controller.setTotalPrice(totalPriceController.text);
+        int? p = int.tryParse(standardizeNumber(totalPriceController.text));
+        if (p is int && size != null && p >= size!) {
+          priceController.text = priceFormat(p / size!);
+        } else {
+          priceController.text = priceFormat(0);
+        }
+      });
+    }
     cityController.addListener(() {
       _controller.setCity(cityController.text);
     });
@@ -247,6 +303,8 @@ class _AddFileState extends State<AddFile> {
     // data collect
     CaseFile data = CaseFile(
       price: int.tryParse(priceController.text),
+      totalPrice: int.tryParse(totalPriceController.text),
+
       city: cityController.text,
       district: districtController.text,
       quarter: quarterController.text,
@@ -350,26 +408,45 @@ class _AddFileState extends State<AddFile> {
               enabled: !disabled,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 0),
-            child: TextFormField(
-              focusNode: priceNode,
-              controller: priceController,
-              enabled: !disabled,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                cityNode.requestFocus();
-              },
-              textDirection: TextDirection.ltr,
-              enableSuggestions: false,
-              autocorrect: false,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: addFileFormLabels_price,
-              ),
-              inputFormatters: [CurrencyInputFormatter()],
-            ),
-          ),
+          (widget.index != 0
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 0),
+                  child: TextFormField(
+                    controller: priceController,
+                    enabled: !disabled,
+                    textInputAction: TextInputAction.next,
+                    onEditingComplete: () {
+                      cityNode.requestFocus();
+                    },
+                    textDirection: TextDirection.ltr,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: "قیمت هر متر مربع (تومان)",
+                    ),
+                    inputFormatters: [CurrencyInputFormatter()],
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 0),
+                  child: TextFormField(
+                    controller: totalPriceController,
+                    enabled: !disabled,
+                    textInputAction: TextInputAction.next,
+                    onEditingComplete: () {
+                      cityNode.requestFocus();
+                    },
+                    textDirection: TextDirection.ltr,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: "قیمت کل (تومان)",
+                    ),
+                    inputFormatters: [CurrencyInputFormatter()],
+                  ),
+                )),
           Padding(
             padding: const EdgeInsets.only(top: 0, bottom: 10),
             child: RMCheckbox(
@@ -607,7 +684,15 @@ class AddFileController extends AddFileControllerErrorHandler {
   }
 
   void setPrice(v) {
+    // data.totalPrice = 8555;
     data.price = int.tryParse(standardizeNumber(v));
+    // print("Hhh" + data.price.toString());
+    // data.totalPrice = 8555;
+    checkCondition();
+  }
+
+  void setTotalPrice(v) {
+    data.totalPrice = int.tryParse(standardizeNumber(v));
     checkCondition();
   }
 

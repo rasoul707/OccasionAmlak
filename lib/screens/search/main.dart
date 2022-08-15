@@ -5,6 +5,7 @@ import '../../widgets/RMCheckbox.dart';
 import '../../widgets/RMRangeSlider.dart';
 import '../../widgets/RMAppBar.dart';
 
+import '../../widgets/RMSwitch.dart';
 import '../../widgets/button.dart';
 import '../../widgets/selectlist.dart';
 import 'list.dart';
@@ -16,6 +17,14 @@ class SearchContent extends StatefulWidget {
   _SearchContentState createState() => _SearchContentState();
 }
 
+const minPrice = 0;
+const maxPrice = 100000000;
+const stepPrice = 2500000;
+
+const minTotalPrice = 0;
+const maxTotalPrice = 150000000000;
+const stepTotalPrice = 50000000;
+
 class _SearchContentState extends State<SearchContent> {
   //
   final OccSelectListController fileTypeController = OccSelectListController();
@@ -23,14 +32,16 @@ class _SearchContentState extends State<SearchContent> {
   final TextEditingController areaController = TextEditingController();
   final TextEditingController buildingAreaController = TextEditingController();
   final RMRangeSliderController priceController = RMRangeSliderController();
+  final RMRangeSliderController totalPriceController =
+      RMRangeSliderController();
   final CheckboxController canBarterController = CheckboxController();
+
+  bool byTotal = false;
 
   @override
   void initState() {
     super.initState();
   }
-
-  int maxPrice = 100000000;
 
   String typeConvert2Slug(String? name) {
     if (name == 'ویلا') {
@@ -55,6 +66,8 @@ class _SearchContentState extends State<SearchContent> {
     List<String> type =
         fileTypeController.activeItems.map((e) => typeConvert2Slug(e)).toList();
     List<String> price = priceController.value;
+    List<String> totalPrice = totalPriceController.value;
+    bool canBarter = canBarterController.value;
 
     Navigator.push(
       context,
@@ -66,6 +79,9 @@ class _SearchContentState extends State<SearchContent> {
           buildingArea: buildingArea,
           type: type,
           price: price,
+          totalPrice: totalPrice,
+          canBarter: canBarter,
+          byTotal: byTotal,
         ),
       ),
     ).then((_) {});
@@ -85,13 +101,35 @@ class _SearchContentState extends State<SearchContent> {
               padding: const EdgeInsets.symmetric(horizontal: 50),
               child: ListView(
                 children: [
+                  RMSwitch(
+                    value: byTotal,
+                    onChange: (val) {
+                      setState(() {
+                        byTotal = val;
+                      });
+                    },
+                    label: "جستجو با قیمت کل",
+                  ),
+                  const Padding(padding: EdgeInsets.only(bottom: 20)),
                   RMRangeSlider(
-                    20000000,
-                    maxPrice - 20000000.toDouble(),
-                    0,
-                    maxPrice,
-                    40,
+                    min: minTotalPrice,
+                    max: maxTotalPrice,
+                    step: stepTotalPrice,
+                    start: 25000000000,
+                    end: 125000000000,
+                    controller: totalPriceController,
+                    label: "محدوده قیمت کل",
+                    show: byTotal,
+                  ),
+                  RMRangeSlider(
+                    min: minPrice,
+                    max: maxPrice,
+                    step: stepPrice,
+                    start: 25000000,
+                    end: 75000000,
                     controller: priceController,
+                    label: "محدوده قیمت (هر متر مربع)",
+                    show: !byTotal,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 0, bottom: 10),

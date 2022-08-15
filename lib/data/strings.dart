@@ -2,7 +2,7 @@
 
 const appTitle = "املاک اکازیون";
 const appDesc = "بزرگترین مرکز اطلاعات\nاملاک شمال کشور";
-const appVer = "ورژن 1.0.1";
+const appVer = "ورژن 1.0.2";
 
 // auth
 const loginFormTitle = "فرم ورود";

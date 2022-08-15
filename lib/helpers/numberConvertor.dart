@@ -54,7 +54,7 @@ class CurrencyInputFormatter extends TextInputFormatter {
     }
 
     final standard = standardizeNumber(newValue.text);
-    double? value = double.tryParse(standard);
+    int? value = int.tryParse(standard);
     final formatted = priceFormat(value);
     return newValue.copyWith(
       text: formatted,

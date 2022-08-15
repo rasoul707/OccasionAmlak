@@ -10,16 +10,18 @@ class RMFileViewItem extends StatelessWidget {
   RMFileViewItem({
     Key? key,
     required this.file,
+    this.byTotal = false,
   }) : super(key: key);
 
-  CaseFile file;
+  final CaseFile file;
+  final bool byTotal;
 
   openFile(context, String id) {
     Navigator.push(
       context,
       PageTransition(
         type: PageTransitionType.fade,
-        child: FileViewSingle(id),
+        child: FileViewSingle(id, byTotal: byTotal),
       ),
     );
   }
@@ -29,7 +31,8 @@ class RMFileViewItem extends StatelessWidget {
     String imageUrl = file.thumbUrl!.file!.elementAt(0);
     String type = file.type!;
     String title = typeConvert(type) + " " + file.city!;
-    String price = priceFormat(file.price);
+    String price = priceFormat(file.price ?? 0);
+    String totalPrice = priceFormat(file.totalPrice ?? 0);
 
     List<Widget> detailsBox = [];
 
@@ -290,66 +293,63 @@ class RMFileViewItem extends StatelessWidget {
                   ),
                   const Padding(padding: EdgeInsets.symmetric(horizontal: 5)),
                   Expanded(
-                    child: Tooltip(
-                      message: "هر متر " + price + " تومان",
-                      child: Container(
-                        height: 75,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(60),
-                          color: lightBGColor,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "هر متر",
+                    child: Container(
+                      height: 75,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(60),
+                        color: lightBGColor,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      child: Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              byTotal ? "قیمت کل" : "هر متر",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              softWrap: true,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    height: 0.9,
+                                    color: textLightBgColor,
+                                  ),
+                            ),
+                            FittedBox(
+                              child: Text(
+                                byTotal ? totalPrice : price,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 softWrap: true,
                                 style: Theme.of(context)
                                     .textTheme
-                                    .titleSmall
+                                    .headlineMedium
                                     ?.copyWith(
-                                      height: 0.9,
+                                      height: 1,
                                       color: textLightBgColor,
                                     ),
                               ),
-                              FittedBox(
-                                child: Text(
-                                  price,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  softWrap: true,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium
-                                      ?.copyWith(
-                                        height: 1,
-                                        color: textLightBgColor,
-                                      ),
-                                ),
-                              ),
-                              Text(
-                                "تومان",
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                softWrap: true,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall
-                                    ?.copyWith(
-                                      height: 0.9,
-                                      color: textLightBgColor,
-                                    ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            Text(
+                              "تومان",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              softWrap: true,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    height: 0.9,
+                                    color: textLightBgColor,
+                                  ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

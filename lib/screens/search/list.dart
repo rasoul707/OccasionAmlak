@@ -21,7 +21,9 @@ class SearchList extends StatefulWidget {
     this.buildingArea,
     this.type,
     this.price,
+    this.totalPrice,
     this.canBarter,
+    this.byTotal = false,
   }) : super(key: key);
 
   String? district;
@@ -29,7 +31,9 @@ class SearchList extends StatefulWidget {
   double? buildingArea;
   List<String>? type;
   List<String>? price;
+  List<String>? totalPrice;
   bool? canBarter;
+  bool byTotal;
 
   @override
   _SearchListState createState() => _SearchListState();
@@ -54,6 +58,7 @@ class _SearchListState extends State<SearchList> {
         .searchFile(
           widget.type!.join(","),
           widget.price!.join(","),
+          widget.totalPrice!.join(","),
           widget.district.toString(),
           widget.area.toString(),
           widget.buildingArea.toString(),
@@ -99,7 +104,7 @@ class _SearchListState extends State<SearchList> {
     });
 
     List<Widget> items = fileItems.map((e) {
-      return RMFileViewItem(file: e);
+      return RMFileViewItem(file: e, byTotal: widget.byTotal);
     }).toList();
 
     return Scaffold(

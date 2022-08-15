@@ -31,6 +31,7 @@ abstract class API {
   Future<ApiResponse> searchFile(
     @Query("type") String type,
     @Query("price") String price,
+    @Query("totalPrice") String totalPrice,
     @Query("district") String district,
     @Query("area") String area,
     @Query("buildingArea") String buildingArea,

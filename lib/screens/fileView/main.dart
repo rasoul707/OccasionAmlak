@@ -12,9 +12,10 @@ import '../../widgets/equipments_list.dart';
 import '../../widgets/snackbar.dart';
 
 class FileViewSingle extends StatefulWidget {
-  FileViewSingle(this.id, {Key? key}) : super(key: key);
+  FileViewSingle(this.id, {Key? key, this.byTotal = false}) : super(key: key);
 
   String id;
+  bool byTotal;
 
   @override
   State<FileViewSingle> createState() => _FileViewSingleState();
@@ -62,7 +63,9 @@ class _FileViewSingleState extends State<FileViewSingle> {
     }
     String type = data.type!;
     String title = typeConvert(type) + "\n" + data.city!;
-    String price = priceFormat(data.price);
+    String price = priceFormat(data.price ?? 0);
+    String totalPrice = priceFormat(data.totalPrice ?? 0);
+
     String documentType = "";
     String authorName = data.author!.displayName ?? "";
     String avatarUrl = defaultAvatar;
@@ -343,9 +346,9 @@ class _FileViewSingleState extends State<FileViewSingle> {
       double pxImageW = 1241;
       List? image = data.picturesUrl?.elementAt(selectedPhoto).file;
 
-      if (image != null) {
-        pxImageW = image.elementAt(1).toDouble();
-        pxImageH = image.elementAt(2).toDouble();
+      if (image != null && image.elementAt(1) > 0 && image.elementAt(2) > 0) {
+        pxImageW = image.elementAt(1)?.toDouble();
+        pxImageH = image.elementAt(2)?.toDouble();
       }
       double imgHeight = pxImageH * width / pxImageW;
 
@@ -628,60 +631,56 @@ class _FileViewSingleState extends State<FileViewSingle> {
                             const Padding(
                               padding: EdgeInsets.symmetric(vertical: 5),
                             ),
-                            Tooltip(
-                              message: "هر متر " + price + " تومان",
-                              child: Container(
-                                height: 75,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(60),
-                                  color: lightBGColor,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 5,
-                                ),
-                                child: Center(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "هر متر",
+                            Container(
+                              height: 75,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(60),
+                                color: lightBGColor,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              child: Center(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      widget.byTotal ? "قیمت کل" : "هر متر",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall
+                                          ?.copyWith(
+                                            height: 0.9,
+                                            color: textLightBgColor,
+                                          ),
+                                    ),
+                                    FittedBox(
+                                      child: Text(
+                                        widget.byTotal ? totalPrice : price,
                                         style: Theme.of(context)
                                             .textTheme
-                                            .titleSmall
+                                            .headlineMedium
                                             ?.copyWith(
-                                              height: 0.9,
+                                              height: 1,
                                               color: textLightBgColor,
                                             ),
                                       ),
-                                      FittedBox(
-                                        child: Text(
-                                          price,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineMedium
-                                              ?.copyWith(
-                                                height: 1,
-                                                color: textLightBgColor,
-                                              ),
-                                        ),
-                                      ),
-                                      Text(
-                                        "تومان",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleSmall
-                                            ?.copyWith(
-                                              height: 0.9,
-                                              color: textLightBgColor,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                    Text(
+                                      "تومان",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall
+                                          ?.copyWith(
+                                            height: 0.9,
+                                            color: textLightBgColor,
+                                          ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

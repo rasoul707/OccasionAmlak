@@ -20,6 +20,7 @@ class CaseFile {
   String? alley;
   List<String>? location;
   int? price;
+  int? totalPrice;
 
   List<int>? pictures;
   int? thumb;
@@ -51,6 +52,7 @@ class CaseFile {
     this.alley,
     this.location,
     this.price,
+    this.totalPrice,
     this.pictures,
     this.thumb,
     this.villa,

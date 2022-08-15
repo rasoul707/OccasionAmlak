@@ -2,23 +2,27 @@ import 'package:flutter/material.dart';
 import '../../helpers/numberConvertor.dart';
 
 class RMRangeSlider extends StatefulWidget {
-  const RMRangeSlider(
-    this.i,
-    this.f,
-    this.min,
-    this.max,
-    this.dev, {
+  const RMRangeSlider({
     Key? key,
+    required this.start,
+    required this.end,
+    required this.min,
+    required this.max,
+    required this.step,
     required this.controller,
+    this.label,
+    this.show = true,
   }) : super(key: key);
 
-  final double i;
-  final double f;
+  final double start;
+  final double end;
 
   final int min;
   final int max;
-  final int dev;
+  final int step;
   final RMRangeSliderController controller;
+  final String? label;
+  final bool show;
 
   @override
   State<RMRangeSlider> createState() => _RMRangeSliderState();
@@ -36,25 +40,28 @@ class _RMRangeSliderState extends State<RMRangeSlider> {
         _currentRangeValues = widget.controller.range;
       });
     });
-    widget.controller.setValue(RangeValues(widget.i, widget.f));
+    widget.controller.setValue(RangeValues(widget.start, widget.end));
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.show) return Container();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(right: 25),
-          child: Text(
-            "محدوده قیمت (هر متر مربع)",
-          ),
-        ),
+        widget.label != null
+            ? Padding(
+                padding: const EdgeInsets.only(right: 25),
+                child: Text(
+                  widget.label!,
+                ),
+              )
+            : Container(),
         RangeSlider(
           values: _currentRangeValues,
           min: widget.min.toDouble(),
           max: widget.max.toDouble(),
-          divisions: widget.dev,
+          divisions: (widget.max - widget.min) ~/ widget.step,
           labels: RangeLabels(
             priceFormat(_currentRangeValues.start.round()),
             priceFormat(_currentRangeValues.end.round()),
