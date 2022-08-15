@@ -508,13 +508,13 @@ class _AddFileState extends State<AddFile> {
               maxLines: 5,
             ),
           ),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(vertical: 10),
-          //   child: ChooseLocation(
-          //     controller: locationController,
-          //     enabled: !disabled,
-          //   ),
-          // ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: ChooseLocation(
+              controller: locationController,
+              enabled: !disabled,
+            ),
+          ),
         ],
       ),
     );
